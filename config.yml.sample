@@ -1,4 +1,4 @@
-github-token: secret-token
+github-token: <secret>
 
 log:
   json: false
@@ -8,9 +8,6 @@ bosh-deployments:
   cf:
     owner: cloudfoundry
     repo: cf-deployment
-    format:
-      match: "v([0-9+.])"
-      replace: "${1}"
     manifest: cf-deployment.yml
     ops:
       - operations/use-haproxy.yml
@@ -46,3 +43,9 @@ github-releases:
   bosh-cli:
     owner: cloudfoundry
     repo: bosh-cli
+  stemcell:
+    owner: cloudfoundry
+    repo: bosh-linux-stemcell-builder
+    format:
+      match: "stable-([0-9+.]+)"
+      replace: "${1}"

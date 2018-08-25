@@ -4,6 +4,11 @@ go:
 repository:
   path: github.com/orange-cloudfoundry/githubrelease_exporter
 build:
+  binaries:
+    - name: githubrelease_cli
+      path: ./cli
+    - name: githubrelease_exporter
+      path: ./exporter
   flags: -a -tags 'netgo static_build'
   ldflags: |
     -X {{repoPath}}/vendor/github.com/prometheus/common/version.Version={{.Version}}

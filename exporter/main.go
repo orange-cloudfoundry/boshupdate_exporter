@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
@@ -96,8 +97,8 @@ func main() {
 	log.Infoln("Starting githubrelease_exporter", version.Info())
 	log.Infoln("Build context", version.BuildContext())
 
-	config := NewConfig(*configFile)
-	manager := NewManager(*config)
+	config := githubrelease.NewConfig(*configFile)
+	manager := githubrelease.NewManager(*config)
 	collector := NewGithubCollector(*metricsEnvironment, manager)
 	prometheus.MustRegister(collector)
 	handler := prometheusHandler()

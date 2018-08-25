@@ -1,9 +1,9 @@
-package main
+package githubrelease
 
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
@@ -23,7 +23,7 @@ type GithubReleaseConfig struct {
 	Owner  string     `json:"owner" yaml:"owner"`
 	Repo   string     `json:"repo"  yaml:"repo"`
 	Types  []string   `json:"types" yaml:"types"`
-	Format *Formatter `json:"formatter" yaml:"formatter"`
+	Format *Formatter `json:"format" yaml:"format"`
 }
 
 // Validate -
@@ -165,7 +165,7 @@ func (c *Config) Validate() error {
 func NewConfig(file io.Reader) *Config {
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Fatalf("unable to read configuration file '%s' : %s", (*configFile).Name(), err)
+		log.Fatalf("unable to read configuration file : %s", err)
 		os.Exit(1)
 	}
 

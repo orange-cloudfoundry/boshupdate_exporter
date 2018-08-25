@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	"time"
@@ -9,37 +10,35 @@ import (
 
 // GithubCollector -
 type GithubCollector struct {
-	manager                   Manager
+	manager                   githubrelease.Manager
 	boshDeploymentMetrics     *prometheus.GaugeVec
 	githubReleaseMetrics      *prometheus.GaugeVec
 	lastScrapeTimestampMetric prometheus.Gauge
 }
 
 // NewGithubCollector -
-func NewGithubCollector(
-	environment string,
-	manager Manager) *GithubCollector {
+func NewGithubCollector(environment string, manager githubrelease.Manager) *GithubCollector {
 
 	boshDeploymentMetrics = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace:   "githubrelease",
 			Subsystem:   "",
-			Name:        "deployments",
+			Name:        "bosh_release_info",
 			Help:        "Wheter last scrap interpolation of bosh manifests resulted in an error (1 for error, 0 for success)",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
-		[]string{"name", "repo", "tag", "release", "version"},
+		[]string{"deployment_name", "github_repo", "manifest_version", "bosh_release_name", "bosh_release_version"},
 	)
 
 	githubReleaseMetrics = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace:   "githubrelease",
 			Subsystem:   "",
-			Name:        "releases",
+			Name:        "release_info",
 			Help:        "Wheter last scrap of github release resulted in an error (1 for error, 0 for success)",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
-		[]string{"name", "repo", "tag"},
+		[]string{"release_name", "github_repo", "release_version"},
 	)
 
 	lastScrapeTimesptampMetric := prometheus.NewGauge(
