@@ -1,0 +1,48 @@
+github-token: bb9b5659b42a4afa8e0636173817a1228441b650
+
+log:
+  json: false
+  level: debug
+
+bosh-deployments:
+  cf:
+    owner: cloudfoundry
+    repo: cf-deployment
+    format:
+      match: "v([0-9+.])"
+      replace: "${1}"
+    manifest: cf-deployment.yml
+    ops:
+      - operations/use-haproxy.yml
+      - operations/backup-and-restore/enable-backup-restore.yml
+
+  prometheus:
+    owner: bosh-prometheus
+    repo: prometheus-boshrelease
+    manifest: manifests/prometheus.yml
+    ops:
+      - manifests/operators/enable-cf-route-registrar.yml
+      - manifests/operators/use-sqlite3.yml
+  bosh:
+    owner: cloudfoundry
+    repo: bosh-deployment
+    manifest: bosh.yml
+    ops:
+      - vsphere/cpi.yml
+      - uaa.yml
+      - credhub.yml
+      - bbr.yml
+
+github-releases:
+  terraform-provider-credhub:
+    owner: orange-cloudfoundry
+    repo: terraform-provider-credhub
+  concourse:
+    owner: concourse
+    repo: concourse
+  bbl:
+    owner: cloudfoundry
+    repo: bosh-bootloader
+  bosh-cli:
+    owner: cloudfoundry
+    repo: bosh-cli
