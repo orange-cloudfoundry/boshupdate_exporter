@@ -1,4 +1,4 @@
-github-token: bb9b5659b42a4afa8e0636173817a1228441b650
+github-token: secret-token
 
 log:
   json: false
