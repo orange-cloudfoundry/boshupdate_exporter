@@ -133,7 +133,7 @@ Apache License 2.0, see [LICENSE][license].
 
 [binaries]: https://github.com/orange-cloudfoundry/githubrelease_exporter/releases
 [github]: https://github.com/cloudfoundry-incubator/github
-[github_api]: https://github-api.cfapps.io/
+[github_api]: https://developer.github.com/v3/
 [contributing]: https://github.com/orange-cloudfoundry/githubrelease_exporter/blob/master/CONTRIBUTING.md
 [golang]: https://golang.org/
 [license]: https://github.com/orange-cloudfoundry/githubrelease_exporter/blob/master/LICENSE
