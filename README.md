@@ -42,7 +42,7 @@ The provided [sample configuration](config.yml.sample) is a good starting point.
 
 * General structure
 
-```
+```yaml
 github-token: <string> # valid token for github api
 bosh-deployment: map[string, *deployment*]
 github-release:  map[string, *release*]
