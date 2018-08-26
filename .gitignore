@@ -14,3 +14,4 @@ config.json
 config.yml
 githubrelease_exporter
 githubrelease_cli
+.tarballs/
