@@ -59,6 +59,15 @@ func (a *Manager) GetRefs(item GithubReleaseConfig) ([]GithubRef, error) {
 		}
 	}
 
+	if item.HasType("tag") {
+		tags, _, err := a.client.Repositories.ListTags(a.ctx, item.Owner, item.Repo, nil)
+		if err != nil {
+			return res, fmt.Errorf("unable to fetch tags from %s/%s: %s", item.Owner, item.Repo, err)
+		}
+		for _, t := range tags {
+			res = append(res, GithubRef{t.GetName(), t.GetCommit().GetAuthor().GetDate().Unix()})
+		}
+	}
 	return res, nil
 }
 
@@ -99,7 +108,7 @@ func (a *Manager) GetContent(ref string, item BoshDeploymentConfig, path string)
 // GetGithubReleases -
 func (a *Manager) GetGithubReleases() []GithubReleaseData {
 	results := []GithubReleaseData{}
-	for name, item := range a.config.GithubReleases {
+	for name, item := range a.config.GithubRelease {
 		entry := log.
 			With("name", name).
 			With("repo", item.Repo).
@@ -137,9 +146,9 @@ func (a *Manager) RenderManifest(manifest []byte, item BoshDeploymentData) []byt
 	entry.Debugf("rendering final manifest")
 
 	tpl := boshtpl.NewTemplate(manifest)
+
 	var opList patch.Ops
 	var opListFinal patch.Ops
-
 	for _, opPath := range item.Ops {
 		val, err := a.GetContent(item.LastRef, item.BoshDeploymentConfig, opPath)
 		if err != nil {
@@ -147,14 +156,12 @@ func (a *Manager) RenderManifest(manifest []byte, item BoshDeploymentData) []byt
 			entry.Warnf("unable to fetch ops-file '%s'", opPath)
 			continue
 		}
-
 		var opDef []patch.OpDefinition
 		if err = yaml.Unmarshal(val, &opDef); err != nil {
 			item.HasError = true
 			entry.Warnf("unable to parse ops-file '%s'", opPath)
 			continue
 		}
-
 		ops, err := patch.NewOpsFromDefinitions(opDef)
 		if err != nil {
 			item.HasError = true
@@ -170,7 +177,24 @@ func (a *Manager) RenderManifest(manifest []byte, item BoshDeploymentData) []byt
 		opListFinal = append(opListFinal, ops)
 	}
 
-	res, err := tpl.Evaluate(boshtpl.MultiVars{}, opListFinal, boshtpl.EvaluateOpts{})
+	varList := []boshtpl.Variables{}
+	for _, varPath := range item.Vars {
+		val, err := a.GetContent(item.LastRef, item.BoshDeploymentConfig, varPath)
+		if err != nil {
+			item.HasError = true
+			entry.Warnf("unable to fetch var-file '%s'", varPath)
+			continue
+		}
+		vars := boshtpl.StaticVariables{}
+		if err = yaml.Unmarshal(val, &vars); err != nil {
+			item.HasError = true
+			entry.Warnf("unable to parse var-file '%s'", varPath)
+			continue
+		}
+		varList = append(varList, vars)
+	}
+
+	res, err := tpl.Evaluate(boshtpl.NewMultiVars(varList), opListFinal, boshtpl.EvaluateOpts{})
 	if err != nil {
 		entry.Warnf("enable to render manifest with ops-files : %s", err)
 		item.HasError = true
@@ -183,7 +207,7 @@ func (a *Manager) RenderManifest(manifest []byte, item BoshDeploymentData) []byt
 // GetBoshDeployments -
 func (a *Manager) GetBoshDeployments() []BoshDeploymentData {
 	results := []BoshDeploymentData{}
-	for name, item := range a.config.BoshDeployments {
+	for name, item := range a.config.BoshDeployment {
 		results = append(results, NewBoshDeploymentData(*item, name))
 		target := &results[len(results)-1]
 

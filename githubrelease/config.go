@@ -80,6 +80,7 @@ type BoshDeploymentConfig struct {
 	GithubReleaseConfig `yaml:",inline"`
 	Manifest            string   `json:"manifest" yaml:"manifest"`
 	Ops                 []string `json:"ops" yaml:"ops"`
+	Vars                []string `json:"vars" yaml:"vars"`
 }
 
 // Validate -
@@ -138,19 +139,19 @@ type Config struct {
 		Level string `json:"level"     yaml:"level"`
 	} `json:"log"     yaml:"log"`
 
-	GithubToken     string                           `json:"github-token"     yaml:"github-token"`
-	BoshDeployments map[string]*BoshDeploymentConfig `json:"bosh-deployments" yaml:"bosh-deployments"`
-	GithubReleases  map[string]*GithubReleaseConfig  `json:"github-releases"  yaml:"github-releases"`
+	GithubToken    string                           `json:"github-token"     yaml:"github-token"`
+	BoshDeployment map[string]*BoshDeploymentConfig `json:"bosh-deployments" yaml:"bosh-deployment"`
+	GithubRelease  map[string]*GithubReleaseConfig  `json:"github-releases"  yaml:"github-release"`
 }
 
 // Validate -
 func (c *Config) Validate() error {
-	for name, data := range c.BoshDeployments {
+	for name, data := range c.BoshDeployment {
 		if err := data.Validate(); err != nil {
 			return fmt.Errorf("invalid bosh deployment '%s', %s", name, err)
 		}
 	}
-	for name, data := range c.GithubReleases {
+	for name, data := range c.GithubRelease {
 		if err := data.Validate(); err != nil {
 			return fmt.Errorf("invalid github release '%s', %s", name, err)
 		}
