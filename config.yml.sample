@@ -4,7 +4,7 @@ log:
   json: false
   level: debug
 
-bosh-deployments:
+bosh-deployment:
   cf:
     owner: cloudfoundry
     repo: cf-deployment
@@ -12,7 +12,6 @@ bosh-deployments:
     ops:
       - operations/use-haproxy.yml
       - operations/backup-and-restore/enable-backup-restore.yml
-
   prometheus:
     owner: bosh-prometheus
     repo: prometheus-boshrelease
@@ -29,14 +28,18 @@ bosh-deployments:
       - uaa.yml
       - credhub.yml
       - bbr.yml
+  concourse:
+    types: [ "tag" ]
+    owner: concourse
+    repo: concourse-bosh-deployment
+    manifest: cluster/concourse.yml
+    vars:
+      - versions.yml
 
-github-releases:
+github-release:
   terraform-provider-credhub:
     owner: orange-cloudfoundry
     repo: terraform-provider-credhub
-  concourse:
-    owner: concourse
-    repo: concourse
   bbl:
     owner: cloudfoundry
     repo: bosh-bootloader
