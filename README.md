@@ -35,7 +35,7 @@ The `token` can be created by following the [Github HowTo][github-create-token]
 
 ### Configuration
 
-The provided [sample configuration][config.yml.sample] is a good starting point.
+The provided [sample configuration](config.yml.sample) is a good starting point.
 
 
 #### Detailed Specification
