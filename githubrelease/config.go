@@ -98,6 +98,7 @@ func (c *BoshDeploymentConfig) Validate() error {
 type ReleaseData struct {
 	HasError bool   `json:"has-error" yaml:"has-error"`
 	LastRef  string `json:"last-ref" yaml:"last-ref"`
+	Time     int64  `json:"time" yaml:"time"`
 	Version  string `json:"version" yaml:"version"`
 }
 
@@ -132,6 +133,14 @@ func NewBoshDeploymentData(config BoshDeploymentConfig, name string) BoshDeploym
 	}
 }
 
+// Manifest -
+type ManifestData struct {
+	Deployment string `json:"deployment"`
+	Name       string `json:"string"`
+	Version    string `json:"version"`
+	HasError   bool   `json:"has_error"`
+}
+
 // Config -
 type Config struct {
 	Log struct {
@@ -139,6 +148,7 @@ type Config struct {
 		Level string `json:"level"     yaml:"level"`
 	} `json:"log"     yaml:"log"`
 
+	Bosh           BoshConfig                       `json:"bosh"             yaml:"bosh"`
 	GithubToken    string                           `json:"github-token"     yaml:"github-token"`
 	BoshDeployment map[string]*BoshDeploymentConfig `json:"bosh-deployments" yaml:"bosh-deployment"`
 	GithubRelease  map[string]*GithubReleaseConfig  `json:"github-releases"  yaml:"github-release"`

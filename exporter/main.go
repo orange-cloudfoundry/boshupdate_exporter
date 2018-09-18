@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net/http"
+	"os"
 )
 
 var (
@@ -52,9 +53,12 @@ func init() {
 }
 
 var (
-	boshDeploymentMetrics      *prometheus.GaugeVec
-	githubReleaseMetrics       *prometheus.GaugeVec
-	lastScrapeTimesptampMetric prometheus.Gauge
+	deploymentMetrics               *prometheus.GaugeVec
+	boshDeploymentMetrics           *prometheus.GaugeVec
+	githubReleaseMetrics            *prometheus.GaugeVec
+	lastScrapeTimestampMetric       prometheus.Gauge
+	lastScrapeErrorMetric           prometheus.Gauge
+	lastScrapeDurationSecondsMetric prometheus.Gauge
 )
 
 type basicAuthHandler struct {
@@ -98,8 +102,11 @@ func main() {
 	log.Infoln("Build context", version.BuildContext())
 
 	config := githubrelease.NewConfig(*configFile)
-	manager := githubrelease.NewManager(*config)
-	collector := NewGithubCollector(*metricsEnvironment, manager)
+	manager, err := githubrelease.NewManager(*config)
+	if err != nil {
+		os.Exit(1)
+	}
+	collector := NewGithubCollector(*metricsEnvironment, *manager)
 	prometheus.MustRegister(collector)
 	handler := prometheusHandler()
 	http.Handle(*metricsPath, handler)

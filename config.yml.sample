@@ -4,6 +4,16 @@ log:
   json: false
   level: debug
 
+bosh:
+  log_level: error
+  url: your-bosh-url
+  ca_cert: path-to-ca-certs
+  client_id: admin
+  client_secret: secret
+  # username: admin
+  # password: my-password
+  # proxy: some proxy to access bosh
+
 bosh-deployment:
   cf:
     owner: cloudfoundry

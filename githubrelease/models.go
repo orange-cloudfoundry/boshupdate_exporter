@@ -1,5 +1,11 @@
 package githubrelease
 
+// GithubRef -
+type GithubRef struct {
+	Ref  string
+	Unix int64
+}
+
 // BoshRelease -
 type BoshRelease struct {
 	Name    string `yaml:"name" json:"name"`

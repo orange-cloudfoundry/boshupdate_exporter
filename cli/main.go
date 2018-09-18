@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
 var (
@@ -29,9 +30,25 @@ func main() {
 		log.Base().SetFormat("logger://stderr?json=true")
 	}
 
-	manager := githubrelease.NewManager(*config)
-	results := manager.GetBoshDeployments()
+	manager, err := githubrelease.NewManager(*config)
+	if err != nil {
+		log.Errorf("unable to start exporter : %s", err)
+		os.Exit(1)
+	}
+
 	var content []byte
+	manifests, err := manager.GetManifests()
+	if err != nil {
+		os.Exit(1)
+	}
+	if *doYaml {
+		content, _ = yaml.Marshal(manifests)
+	} else {
+		content, _ = json.Marshal(manifests)
+	}
+	fmt.Println(string(content))
+
+	results := manager.GetBoshDeployments()
 	if *doYaml {
 		content, _ = yaml.Marshal(results)
 	} else {
