@@ -101,6 +101,7 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 				HasError:   true,
 			})
 		}
+
 		if data.Name == "" {
 			data.Name = deployment.Name()
 		}
@@ -108,9 +109,16 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 			log.Debugf("excluding deployment '%s'", data.Name)
 			continue
 		}
+
 		if data.Version == "" {
-			data.Version = "unspecified"
+			log.Errorf("unable to find manifest version for deployment '%s'", deployment.Name())
+			res = append(res, BoshDeploymentData{
+				Deployment: deployment.Name(),
+				HasError:   true,
+			})
+			continue
 		}
+
 		if re.MatchString(data.Version) {
 			data.Version = re.ReplaceAllString(data.Version, "${1}")
 		}

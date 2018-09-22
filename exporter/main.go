@@ -97,7 +97,7 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	collector := NewBoshUpdateCollector(*metricsNamespace, *metricsEnvironment, *manager)
+	collector := NewBoshUpdateCollector(*metricsNamespace, *metricsEnvironment, manager)
 	prometheus.MustRegister(collector)
 	handler := prometheusHandler()
 	http.Handle(*metricsPath, handler)

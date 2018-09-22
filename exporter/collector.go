@@ -9,7 +9,7 @@ import (
 
 // BoshUpdateCollector -
 type BoshUpdateCollector struct {
-	manager                         boshupdate.Manager
+	manager                         *boshupdate.Manager
 	manifestRelease                 *prometheus.GaugeVec
 	manifestBoshRelease             *prometheus.GaugeVec
 	deploymentStatus                *prometheus.GaugeVec
@@ -20,7 +20,7 @@ type BoshUpdateCollector struct {
 }
 
 // NewBoshUpdateCollector -
-func NewBoshUpdateCollector(namespace string, environment string, manager boshupdate.Manager) *BoshUpdateCollector {
+func NewBoshUpdateCollector(namespace string, environment string, manager *boshupdate.Manager) *BoshUpdateCollector {
 	manifestRelease := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace:   namespace,
