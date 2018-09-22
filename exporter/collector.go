@@ -70,7 +70,7 @@ func NewBoshUpdateCollector(namespace string, environment string, manager boshup
 			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "last_scrape_timestamp",
-			Help:        "Number of seconds since 1970 since last scrape of metrics from boshupdate.",
+			Help:        "Seconds from epoch since last scrape of metrics from boshupdate.",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
 	)
@@ -80,7 +80,7 @@ func NewBoshUpdateCollector(namespace string, environment string, manager boshup
 			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "last_scrape_error",
-			Help:        "Whether the last scrape of metrics resulted in an error (1 for error, 0 for success).",
+			Help:        "Number of errors in last scrape of metrics.",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
 	)

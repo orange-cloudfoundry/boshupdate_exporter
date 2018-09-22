@@ -1,8 +1,13 @@
 # Boshupdate Prometheus Exporter [![Build Status](https://travis-ci.org/orange-cloudfoundry/boshupdate_exporter.png)](https://travis-ci.org/orange-cloudfoundry/boshupdate_exporter)
 
-A [Prometheus][prometheus] exporter for [Github][github]. The exporter exports informational metrics
-about available releases on github. It is also capable of analyzing [BOSH][bosh] deployment manifests
-in order to extract recommended versions of [BOSH][bosh] releases.
+A [Prometheus][prometheus] exporter that identifies out of date [BOSH][bosh] deployments.
+
+It queries [Github][github] and fetches available releases of canonical [BOSH][bosh] manifests
+such as [cf-deployment][cf-deployment], then conciliates with actual running deployments
+fetched from [BOSH][bosh]  director.
+
+It is also capable of analyzing [BOSH][bosh] manifests in order to extract recommended
+versions of [BOSH][bosh] releases.
 
 ## Installation
 
@@ -33,7 +38,20 @@ This exporter can be deployed using the [Githubexporter BOSH Release][githubexpo
 In order to connect to the [Github API][github_api] a `token` must be provided.
 The `token` can be created by following the [Github HowTo][github-create-token]
 
-### Configuration
+### Bosh deployment prerequites
+
+The exporter identifies the version of a running deployment by extracting the `manifest_version`.
+
+This key is already built-in some canonical manifests like [cf-deployment][cf-deployment]
+but must be manually added in others using the operator `set-manifest-version.yml`
+
+```yml
+- type: replace
+  path: /manifest_version?
+  value: v((version))
+```
+
+### Exporter Configuration
 
 The provided [sample configuration](config.yml.sample) is a good starting point.
 
@@ -43,23 +61,35 @@ The provided [sample configuration](config.yml.sample) is a good starting point.
 * General structure
 
 ```yaml
-github-token: <string> # valid token for github api
-bosh-deployment: map[string, *deployment*]
-github-release:  map[string, *release*]
+bosh:
+  log_level: <log_level>
+  url:       <url>        # url (scheme://host:port) to director endpoint
+  ca_cert:   <path>       # path to director CA certificate
+  client_id: <string>     # client id
+  client_secret: <string> # client secret
+  proxy: <url>            # proxy url, if any.
+  excludes: list[regexp]  # list of bosh deployment to exclude from scrap
+
+github:
+  token: <string>                          # your github token here
+  update_interval: 4h                      # interval between two github updates
+  manifest_releases: map[string, manifest] # list of canonical manifests to monitor
+  generic_releases:  map[string, generic]  # list of generic github release to monitor
 ```
 
 
-* *deployment*
+* *manifest*
 
 ```yaml
 <name>:
     types: *release-types*
     format: *release-formatter*
-    owner: <string>     # github project's owner or organization
-    repo: <string>      # github project's name
-    manifest: <string>  # remote path to main BOSH manifest
-    ops: list[string]   # list of remote ops-file paths to apply to main manifest
-    vars: list[string]  # list of remote vars-file paths to apply to main manifest
+    owner: <string>        # github project's owner or organization
+    repo: <string>         # github project's name
+    manifest: <string>     # remote path to main BOSH manifest
+    ops: list[string]      # list of remote ops-file paths to apply to main manifest
+    vars: list[string]     # list of remote vars-file paths to apply to main manifest
+    matchers: list[string] # list of regexp that match running deployments names
 ```
 
 * *release*
@@ -72,7 +102,7 @@ github-release:  map[string, *release*]
     repo: <string>      # github project's name
 ```
 
-* *types*
+* *release-types*
 
 ```
 # List of objects types to consider as a release.
@@ -118,11 +148,16 @@ format:
 
 The exporter returns the following  metrics:
 
-| Metric                                    | Description                                                                       | Labels                                                                                                           |
-| ------                                    | -----------                                                                       | ------                                                                                                           |
-| *metrics.namespace*_bosh_release_info     | Informations about recommended bosh releases used by a particular bosh deployment | `environment`, `deployment_name`, `github_repo`, `manifest_version`, `bosh_release_name`, `bosh_release_version` |
-| *metrics.namespace*_release_info          | Informations about available github releases a given repository                   | `environment`, `release_name`, `github_repo`, `release_version`                                                  |
-| *metrics.namespace*_last_scrape_timestamp | Number of seconds since 1970 since last scrape of metrics                         | `environment`                                                                                                    |
+
+| Metric                                         | Description                                                                                   | Labels                                                                                     |
+|------------------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| *metrics.namespace*_manifest_release           | Seconds from epoch since canonical manifest version if out-of-date, 0 means up-to-date        | `environment`, `name`, `version`, `owner`, `repo`                                          |
+| *metrics.namespace*_manifest_bosh_release_info | Information about recommended bosh releases used by last available canonical manifest release | `environment`, `manifest_name`, `onwer`, `repo`, `boshrelease_name`, `boshrelease_version` |
+| *metrics.namespace*_generic_release            | Seconds from epoch since repository version is out-of-date, 0 means up-to-date                | `environment`, `name`, `version`, `owner`, `repo`                                          |
+| *metrics.namespace*_deployment_status          | Seconds from epoch since deployment is out-of-date, , 0 means up-to-date                      | `environment`, `name`, `current`, `latest`                                                 |
+| *metrics.namespace*_last_scrape_timestamp      | Seconds from epoch since last scrape of metrics from boshupdate                               | `environment`                                                                              |
+| *metrics.namespace*_last_scrape_error          | Number of errors in last scrape of metrics                                                    | `environment`                                                                              |
+| *metrics.namespace*_last_scrape_duration       | Duration of the last scrape                                                                   | `environment`                                                                              |
 
 ## Contributing
 
@@ -140,7 +175,8 @@ Apache License 2.0, see [LICENSE][license].
 [license]: https://github.com/orange-cloudfoundry/boshupdate_exporter/blob/master/LICENSE
 [prometheus]: https://prometheus.io/
 [github-create-token]: https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
-
+[bosh]: https://bosh.io
+[cf-deployment]: https://github.com/cloudfoundry/cf-deployment
 <!-- Local Variables: -->
-<!-- ispell-local-dictionary: "en" -->
+<!-- ispell-local-dictionary: "american" -->
 <!-- End: -->
