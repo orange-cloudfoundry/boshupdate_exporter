@@ -240,6 +240,12 @@
 			"revisionTime": "2018-08-16T20:22:28Z"
 		},
 		{
+			"checksumSHA1": "18YrywDvb67HU8xYF5vqKMgelx0=",
+			"path": "github.com/pkg/errors",
+			"revision": "c059e472caf75dbe73903f6521a20abac245b17f",
+			"revisionTime": "2018-09-11T06:21:13Z"
+		},
+		{
 			"checksumSHA1": "vuxZYORrJkB2dB6OXtqVCfT7+0I=",
 			"path": "github.com/prometheus/client_golang/prometheus",
 			"revision": "5b23715facdef1452016bae512489c3cdf82458c",
