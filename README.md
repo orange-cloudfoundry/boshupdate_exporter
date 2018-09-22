@@ -1,4 +1,4 @@
-# GithubRelease Prometheus Exporter [![Build Status](https://travis-ci.org/orange-cloudfoundry/githubrelease_exporter.png)](https://travis-ci.org/orange-cloudfoundry/githubrelease_exporter)
+# Boshupdate Prometheus Exporter [![Build Status](https://travis-ci.org/orange-cloudfoundry/boshupdate_exporter.png)](https://travis-ci.org/orange-cloudfoundry/boshupdate_exporter)
 
 A [Prometheus][prometheus] exporter for [Github][github]. The exporter exports informational metrics
 about available releases on github. It is also capable of analyzing [BOSH][bosh] deployment manifests
@@ -11,15 +11,15 @@ in order to extract recommended versions of [BOSH][bosh] releases.
 Download the already existing [binaries][binaries] for your platform:
 
 ```bash
-$ ./githubrelease_exporter <flags>
+$ ./boshupdate_exporter <flags>
 ```
 
 ### Docker
 
-To run the githubrelease exporter as a Docker container, run:
+To run the boshupdate exporter as a Docker container, run:
 
 ```bash
-$ docker run -p 9362:9362 orangeopensource/githubrelease-exporter <flags>
+$ docker run -p 9362:9362 orangeopensource/boshupdate-exporter <flags>
 ```
 
 ### BOSH
@@ -101,17 +101,17 @@ format:
 
 ### Flags
 
-| Flag / Environment Variable                                             | Required | Default         | Description                                                                                                                                                                                                                           |
-| ---------------------------                                             | -------- | -------         | -----------                                                                                                                                                                                                                           |
-| `config`<br />`GITHUBRELEASE_EXPORTER_CONFIG`                           | No       | `config.yml`    | Path to configuration file                                                                                                                                                                                                            |
-| `metrics.namespace`<br />`GITHUBRELEASE_EXPORTER_METRICS_NAMESPACE`     | No       | `githubrelease` | Metrics Namespace                                                                                                                                                                                                                     |
-| `metrics.environment`<br />`GITHUBRELEASE_EXPORTER_METRICS_ENVIRONMENT` | Yes      |                 | `environment` label to be attached to metrics                                                                                                                                                                                         |
-| `web.listen-address`<br />`GITHUBRELEASE_EXPORTER_WEB_LISTEN_ADDRESS`   | No       | `:9362`         | Address to listen on for web interface and telemetry                                                                                                                                                                                  |
-| `web.telemetry-path`<br />`GITHUBRELEASE_EXPORTER_WEB_TELEMETRY_PATH`   | No       | `/metrics`      | Path under which to expose Prometheus metrics                                                                                                                                                                                         |
-| `web.auth.username`<br />`GITHUBRELEASE_EXPORTER_WEB_AUTH_USERNAME`     | No       |                 | Username for web interface basic auth                                                                                                                                                                                                 |
-| `web.auth.password`<br />`GITHUBRELEASE_EXPORTER_WEB_AUTH_PASSWORD`     | No       |                 | Password for web interface basic auth                                                                                                                                                                                                 |
-| `web.tls.cert_file`<br />`GITHUBRELEASE_EXPORTER_WEB_TLS_CERTFILE`      | No       |                 | Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate |
-| `web.tls.key_file`<br />`GITHUBRELEASE_EXPORTER_WEB_TLS_KEYFILE`        | No       |                 | Path to a file that contains the TLS private key (PEM format)                                                                                                                                                                         |
+| Flag / Environment Variable                                          | Required | Default         | Description                                                                                                                                                                                                                           |
+| ---------------------------                                          | -------- | -------         | -----------                                                                                                                                                                                                                           |
+| `config`<br />`BOSHUPDATE_EXPORTER_CONFIG`                           | No       | `config.yml`    | Path to configuration file                                                                                                                                                                                                            |
+| `metrics.namespace`<br />`BOSHUPDATE_EXPORTER_METRICS_NAMESPACE`     | No       | `boshupdate`    | Metrics Namespace                                                                                                                                                                                                                     |
+| `metrics.environment`<br />`BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT` | Yes      |                 | `environment` label to be attached to metrics                                                                                                                                                                                         |
+| `web.listen-address`<br />`BOSHUPDATE_EXPORTER_WEB_LISTEN_ADDRESS`   | No       | `:9362`         | Address to listen on for web interface and telemetry                                                                                                                                                                                  |
+| `web.telemetry-path`<br />`BOSHUPDATE_EXPORTER_WEB_TELEMETRY_PATH`   | No       | `/metrics`      | Path under which to expose Prometheus metrics                                                                                                                                                                                         |
+| `web.auth.username`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_USERNAME`     | No       |                 | Username for web interface basic auth                                                                                                                                                                                                 |
+| `web.auth.password`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_PASSWORD`     | No       |                 | Password for web interface basic auth                                                                                                                                                                                                 |
+| `web.tls.cert_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_CERTFILE`      | No       |                 | Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate |
+| `web.tls.key_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE`        | No       |                 | Path to a file that contains the TLS private key (PEM format)                                                                                                                                                                         |
 
 
 ### Metrics
@@ -132,14 +132,13 @@ Refer to the [contributing guidelines][contributing].
 
 Apache License 2.0, see [LICENSE][license].
 
-[binaries]: https://github.com/orange-cloudfoundry/githubrelease_exporter/releases
+[binaries]: https://github.com/orange-cloudfoundry/boshupdate_exporter/releases
 [github]: https://github.com/cloudfoundry-incubator/github
 [github_api]: https://developer.github.com/v3/
-[contributing]: https://github.com/orange-cloudfoundry/githubrelease_exporter/blob/master/CONTRIBUTING.md
+[contributing]: https://github.com/orange-cloudfoundry/boshupdate_exporter/blob/master/CONTRIBUTING.md
 [golang]: https://golang.org/
-[license]: https://github.com/orange-cloudfoundry/githubrelease_exporter/blob/master/LICENSE
+[license]: https://github.com/orange-cloudfoundry/boshupdate_exporter/blob/master/LICENSE
 [prometheus]: https://prometheus.io/
-[githubrelease-boshrelease]: https://github.com/bosh-prometheus/prometheus-boshrelease
 [github-create-token]: https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
 
 <!-- Local Variables: -->

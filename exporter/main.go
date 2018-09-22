@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
+	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
@@ -12,40 +12,40 @@ import (
 
 var (
 	configFile = kingpin.Flag(
-		"config", "Configuration file path ($GITHUBRELEASE_EXPORTER_CONFIG)",
-	).Envar("GITHUBRELEASE_EXPORTER_CONFIG").Default("config.yml").File()
+		"config", "Configuration file path ($BOSHUPDATE_EXPORTER_CONFIG)",
+	).Envar("BOSHUPDATE_EXPORTER_CONFIG").Default("config.yml").File()
 
 	metricsNamespace = kingpin.Flag(
-		"metrics.namespace", "Metrics Namespace ($GITHUBRELEASE_EXPORTER_METRICS_NAMESPACE)",
-	).Envar("GITHUBRELEASE_EXPORTER_METRICS_NAMESPACE").Default("credhub").String()
+		"metrics.namespace", "Metrics Namespace ($BOSHUPDATE_EXPORTER_METRICS_NAMESPACE)",
+	).Envar("BOSHUPDATE_EXPORTER_METRICS_NAMESPACE").Default("boshupdate").String()
 
 	metricsEnvironment = kingpin.Flag(
-		"metrics.environment", "Credhub environment label to be attached to metrics ($GITHUBRELEASE_EXPORTER_METRICS_ENVIRONMENT)",
-	).Envar("GITHUBRELEASE_EXPORTER_METRICS_ENVIRONMENT").Required().String()
+		"metrics.environment", "Credhub environment label to be attached to metrics ($BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT)",
+	).Envar("BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT").Required().String()
 
 	listenAddress = kingpin.Flag(
-		"web.listen-address", "Address to listen on for web interface and telemetry ($GITHUBRELEASE_EXPORTER_WEB_LISTEN_ADDRESS)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_LISTEN_ADDRESS").Default(":9362").String()
+		"web.listen-address", "Address to listen on for web interface and telemetry ($BOSHUPDATE_EXPORTER_WEB_LISTEN_ADDRESS)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_LISTEN_ADDRESS").Default(":9362").String()
 
 	metricsPath = kingpin.Flag(
-		"web.telemetry-path", "Path under which to expose Prometheus metrics ($GITHUBRELEASE_EXPORTER_WEB_TELEMETRY_PATH)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_TELEMETRY_PATH").Default("/metrics").String()
+		"web.telemetry-path", "Path under which to expose Prometheus metrics ($BOSHUPDATE_EXPORTER_WEB_TELEMETRY_PATH)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_TELEMETRY_PATH").Default("/metrics").String()
 
 	authUsername = kingpin.Flag(
-		"web.auth.username", "Username for web interface basic auth ($GITHUBRELEASE_EXPORTER_WEB_AUTH_USERNAME)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_AUTH_USERNAME").String()
+		"web.auth.username", "Username for web interface basic auth ($BOSHUPDATE_EXPORTER_WEB_AUTH_USERNAME)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_AUTH_USERNAME").String()
 
 	authPassword = kingpin.Flag(
-		"web.auth.password", "Password for web interface basic auth ($GITHUBRELEASE_EXPORTER_WEB_AUTH_PASSWORD)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_AUTH_PASSWORD").String()
+		"web.auth.password", "Password for web interface basic auth ($BOSHUPDATE_EXPORTER_WEB_AUTH_PASSWORD)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_AUTH_PASSWORD").String()
 
 	tlsCertFile = kingpin.Flag(
-		"web.tls.cert_file", "Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate ($GITHUBRELEASE_EXPORTER_WEB_TLS_CERTFILE)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_TLS_KEYFILE").ExistingFile()
+		"web.tls.cert_file", "Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate ($BOSHUPDATE_EXPORTER_WEB_TLS_CERTFILE)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE").ExistingFile()
 
 	tlsKeyFile = kingpin.Flag(
-		"web.tls.key_file", "Path to a file that contains the TLS private key (PEM format) ($GITHUBRELEASE_EXPORTER_WEB_TLS_KEYFILE)",
-	).Envar("GITHUBRELEASE_EXPORTER_WEB_TLS_KEYFILE").ExistingFile()
+		"web.tls.key_file", "Path to a file that contains the TLS private key (PEM format) ($BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE)",
+	).Envar("BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE").ExistingFile()
 )
 
 func init() {
@@ -85,19 +85,19 @@ func prometheusHandler() http.Handler {
 
 func main() {
 	log.AddFlags(kingpin.CommandLine)
-	kingpin.Version(version.Print("githubrelease_exporter"))
+	kingpin.Version(version.Print("boshupdate_exporter"))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
-	log.Infoln("Starting githubrelease_exporter", version.Info())
+	log.Infoln("Starting boshupdate_exporter", version.Info())
 	log.Infoln("Build context", version.BuildContext())
 
-	config := githubrelease.NewConfig(*configFile)
-	manager, err := githubrelease.NewManager(*config)
+	config := boshupdate.NewConfig(*configFile)
+	manager, err := boshupdate.NewManager(*config)
 	if err != nil {
 		os.Exit(1)
 	}
-	collector := NewGithubCollector(*metricsEnvironment, *manager)
+	collector := NewBoshUpdateCollector(*metricsNamespace, *metricsEnvironment, *manager)
 	prometheus.MustRegister(collector)
 	handler := prometheusHandler()
 	http.Handle(*metricsPath, handler)

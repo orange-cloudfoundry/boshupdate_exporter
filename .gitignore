@@ -12,6 +12,7 @@
 *.out
 config.json
 config.yml
-githubrelease_exporter
-githubrelease_cli
+boshupdate_exporter
+boshupdate_cli
 .tarballs/
+.build/

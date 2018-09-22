@@ -6,7 +6,7 @@ pkgs   = $(shell $(GO) list ./... | grep -v /vendor/)
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
 TARBALLS_DIR            ?= $(shell pwd)/.tarballs
-DOCKER_IMAGE_NAME       ?= githubrelease-exporter
+DOCKER_IMAGE_NAME       ?= boshupdate-exporter
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
 all: format build test

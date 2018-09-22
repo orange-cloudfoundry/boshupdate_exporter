@@ -2,10 +2,10 @@ verbose: false
 go:
   cgo: false
 repository:
-  path: github.com/orange-cloudfoundry/githubrelease_exporter
+  path: github.com/orange-cloudfoundry/boshupdate_exporter
 build:
   binaries:
-    - name: githubrelease_exporter
+    - name: boshupdate_exporter
       path: ./exporter
   flags: -a -tags 'netgo static_build'
   ldflags: |

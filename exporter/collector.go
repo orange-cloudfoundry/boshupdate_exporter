@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
+	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 	"time"
 )
 
-// GithubCollector -
-type GithubCollector struct {
-	manager                         githubrelease.Manager
+// BoshUpdateCollector -
+type BoshUpdateCollector struct {
+	manager                         boshupdate.Manager
 	manifestRelease                 *prometheus.GaugeVec
 	manifestBoshRelease             *prometheus.GaugeVec
 	deploymentStatus                *prometheus.GaugeVec
@@ -19,11 +19,11 @@ type GithubCollector struct {
 	lastScrapeDurationSecondsMetric prometheus.Gauge
 }
 
-// NewGithubCollector -
-func NewGithubCollector(environment string, manager githubrelease.Manager) *GithubCollector {
+// NewBoshUpdateCollector -
+func NewBoshUpdateCollector(namespace string, environment string, manager boshupdate.Manager) *BoshUpdateCollector {
 	manifestRelease := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "manifest_release",
 			Help:        "Seconds from epoch since deployment release is out of date, (0 means up to date)",
@@ -34,7 +34,7 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 	manifestBoshRelease := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "manifest_bosh_release_info",
 			Help:        "Informational metric that gives the bosh release versions requests by the lastest version of a manifest release, (always 0)",
@@ -45,10 +45,10 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 	genericRelease := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "generic_release",
-			Help:        "Seconds from epoch since this github release is out of date, (0 means up to date)",
+			Help:        "Seconds from epoch since github release is out of date, (0 means up to date)",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
 		[]string{"name", "version", "owner", "repo"},
@@ -56,7 +56,7 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 	deploymentStatus := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "deployment_status",
 			Help:        "Seconds from epoch since this deployment is out of date, (0 means up to date)",
@@ -67,17 +67,17 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 	lastScrapeTimestampMetric := prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "last_scrape_timestamp",
-			Help:        "Number of seconds since 1970 since last scrape of metrics from githubrelease.",
+			Help:        "Number of seconds since 1970 since last scrape of metrics from boshupdate.",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
 	)
 
 	lastScrapeErrorMetric := prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "last_scrape_error",
 			Help:        "Whether the last scrape of metrics resulted in an error (1 for error, 0 for success).",
@@ -87,7 +87,7 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 	lastScrapeDurationSecondsMetric := prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Namespace:   "githubrelease",
+			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "last_scrape_duration",
 			Help:        "Duration of the last scrape.",
@@ -95,7 +95,7 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 		},
 	)
 
-	return &GithubCollector{
+	return &BoshUpdateCollector{
 		manager:                         manager,
 		manifestRelease:                 manifestRelease,
 		manifestBoshRelease:             manifestBoshRelease,
@@ -109,9 +109,9 @@ func NewGithubCollector(environment string, manager githubrelease.Manager) *Gith
 
 // getVersion -
 // fetch deployment.Versions match manifest.Name
-func (c GithubCollector) getVersion(
-	deployment githubrelease.BoshDeploymentData,
-	releases []githubrelease.ManifestReleaseData) (*githubrelease.ManifestReleaseData, *githubrelease.Version) {
+func (c BoshUpdateCollector) getVersion(
+	deployment boshupdate.BoshDeploymentData,
+	releases []boshupdate.ManifestReleaseData) (*boshupdate.ManifestReleaseData, *boshupdate.Version) {
 
 	for _, r := range releases {
 		if !r.Match(deployment.ManifestName) {
@@ -127,8 +127,8 @@ func (c GithubCollector) getVersion(
 }
 
 // Collect -
-func (c GithubCollector) Collect(ch chan<- prometheus.Metric) {
-	log.Debugf("collecting githubrelease metrics")
+func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
+	log.Debugf("collecting boshupdate metrics")
 
 	startTime := time.Now()
 	c.lastScrapeErrorMetric.Set(0.0)
@@ -206,7 +206,7 @@ func (c GithubCollector) Collect(ch chan<- prometheus.Metric) {
 }
 
 // Describe -
-func (c GithubCollector) Describe(ch chan<- *prometheus.Desc) {
+func (c BoshUpdateCollector) Describe(ch chan<- *prometheus.Desc) {
 	c.manifestRelease.Describe(ch)
 	c.manifestBoshRelease.Describe(ch)
 	c.deploymentStatus.Describe(ch)

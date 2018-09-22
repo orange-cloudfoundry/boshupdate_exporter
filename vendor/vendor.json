@@ -503,5 +503,5 @@
 			"revisionTime": "2017-08-12T16:00:11Z"
 		}
 	],
-	"rootPath": "github.com/orange-cloudfoundry/githubrelease_exporter"
+	"rootPath": "github.com/orange-cloudfoundry/boshupdate_exporter"
 }

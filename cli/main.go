@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
+	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -15,21 +15,21 @@ var (
 )
 
 func main() {
-	kingpin.Version(version.Print("githubrelease_cli"))
+	kingpin.Version(version.Print("boshupdate_cli"))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
 	log.Base().SetFormat("logger://stderr")
 	log.Base().SetLevel("error")
 
-	config := githubrelease.NewConfig(*configFile)
+	config := boshupdate.NewConfig(*configFile)
 	log.Base().SetLevel(config.Log.Level)
 	if config.Log.JSON {
 		log.Base().SetFormat("logger://stderr?json=true")
 	}
 
 	var content []byte
-	manager, err := githubrelease.NewManager(*config)
+	manager, err := boshupdate.NewManager(*config)
 	if err != nil {
 		log.Errorf("unable to start exporter : %s", err)
 		os.Exit(1)

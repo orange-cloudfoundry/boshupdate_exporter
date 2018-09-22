@@ -1,4 +1,4 @@
-package githubrelease
+package boshupdate
 
 import (
 	"regexp"
