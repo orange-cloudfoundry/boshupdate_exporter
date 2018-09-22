@@ -52,15 +52,6 @@ func init() {
 	prometheus.MustRegister(version.NewCollector(*metricsNamespace))
 }
 
-var (
-	deploymentMetrics               *prometheus.GaugeVec
-	boshDeploymentMetrics           *prometheus.GaugeVec
-	githubReleaseMetrics            *prometheus.GaugeVec
-	lastScrapeTimestampMetric       prometheus.Gauge
-	lastScrapeErrorMetric           prometheus.Gauge
-	lastScrapeDurationSecondsMetric prometheus.Gauge
-)
-
 type basicAuthHandler struct {
 	handler  http.HandlerFunc
 	username string

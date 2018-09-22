@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/orange-cloudfoundry/githubrelease_exporter/githubrelease"
 	"github.com/prometheus/common/log"
@@ -13,7 +12,6 @@ import (
 
 var (
 	configFile = kingpin.Flag("config", "Configuration file path").Required().File()
-	doYaml     = kingpin.Flag("yaml", "Generate yaml output instead of json").Bool()
 )
 
 func main() {
@@ -30,37 +28,26 @@ func main() {
 		log.Base().SetFormat("logger://stderr?json=true")
 	}
 
+	var content []byte
 	manager, err := githubrelease.NewManager(*config)
 	if err != nil {
 		log.Errorf("unable to start exporter : %s", err)
 		os.Exit(1)
 	}
 
-	var content []byte
-	manifests, err := manager.GetManifests()
+	manifests := manager.GetManifestReleases()
+	content, _ = yaml.Marshal(manifests)
+	fmt.Println(string(content))
+
+	generic := manager.GetGenericReleases()
+	content, _ = yaml.Marshal(generic)
+	fmt.Println(string(content))
+
+	deployments, err := manager.GetBoshDeployments()
 	if err != nil {
+		log.Errorf("unable to fetch deployments : %s", err)
 		os.Exit(1)
 	}
-	if *doYaml {
-		content, _ = yaml.Marshal(manifests)
-	} else {
-		content, _ = json.Marshal(manifests)
-	}
-	fmt.Println(string(content))
-
-	results := manager.GetBoshDeployments()
-	if *doYaml {
-		content, _ = yaml.Marshal(results)
-	} else {
-		content, _ = json.Marshal(results)
-	}
-	fmt.Println(string(content))
-
-	results2 := manager.GetGithubReleases()
-	if *doYaml {
-		content, _ = yaml.Marshal(results2)
-	} else {
-		content, _ = json.Marshal(results2)
-	}
+	content, _ = yaml.Marshal(deployments)
 	fmt.Println(string(content))
 }

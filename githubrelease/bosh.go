@@ -7,18 +7,42 @@ import (
 	"github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cloudfoundry/bosh-utils/system"
 	"os"
+	"regexp"
 )
 
 // BoshConfig -
 type BoshConfig struct {
-	URL          string `json:"url" yaml:"url"`
-	LogLevel     string `json:"log_level" yaml:"log_level"`
-	CaCert       string `json:"ca_cert" yaml:"ca_cert"`
-	Username     string `json:"username" yaml:"username"`
-	Password     string `json:"password" yaml:"password"`
-	ClientID     string `json:"client_id" yaml:"client_id"`
-	ClientSecret string `json:"client_secret" yaml:"client_secret"`
-	Proxy        string `json:"proxy" yaml:"proxy"`
+	URL          string   `yaml:"url"`
+	LogLevel     string   `yaml:"log_level"`
+	CaCert       string   `yaml:"ca_cert"`
+	Username     string   `yaml:"username"`
+	Password     string   `yaml:"password"`
+	ClientID     string   `yaml:"client_id"`
+	ClientSecret string   `yaml:"client_secret"`
+	Excludes     []string `yaml:"excludes"`
+	Proxy        string   `yaml:"proxy"`
+}
+
+func (c *BoshConfig) validate() error {
+	if len(c.URL) == 0 {
+		return fmt.Errorf("missing mandatory url")
+	}
+	for _, f := range c.Excludes {
+		if _, err := regexp.Compile(f); err != nil {
+			return fmt.Errorf("invalid exclude filter regexp '%s'", f)
+		}
+	}
+	return nil
+}
+
+// IsExcluded - Tells if name is matching one of configured exclude filters
+func (c *BoshConfig) IsExcluded(name string) bool {
+	for _, f := range c.Excludes {
+		if regexp.MustCompile(f).MatchString(name) {
+			return true
+		}
+	}
+	return false
 }
 
 func readCACert(CACertFile string, logger logger.Logger) (string, error) {

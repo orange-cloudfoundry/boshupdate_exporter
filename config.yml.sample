@@ -1,64 +1,68 @@
-github-token: <secret>
-
 log:
   json: false
-  level: debug
+  level: info
 
 bosh:
   log_level: error
-  url: your-bosh-url
-  ca_cert: path-to-ca-certs
+  url: https://10.0.0.6:25555
+  ca_cert: <path-to-bosh-ca-cert>
   client_id: admin
-  client_secret: secret
-  # username: admin
-  # password: my-password
-  # proxy: some proxy to access bosh
+  client_secret: <secret>
+  proxy: <proxy if any>
+  excludes:
+    - compilation
 
-bosh-deployment:
-  cf:
-    owner: cloudfoundry
-    repo: cf-deployment
-    manifest: cf-deployment.yml
-    ops:
-      - operations/use-haproxy.yml
-      - operations/backup-and-restore/enable-backup-restore.yml
-  prometheus:
-    owner: bosh-prometheus
-    repo: prometheus-boshrelease
-    manifest: manifests/prometheus.yml
-    ops:
-      - manifests/operators/enable-cf-route-registrar.yml
-      - manifests/operators/use-sqlite3.yml
-  bosh:
-    owner: cloudfoundry
-    repo: bosh-deployment
-    manifest: bosh.yml
-    ops:
-      - vsphere/cpi.yml
-      - uaa.yml
-      - credhub.yml
-      - bbr.yml
-  concourse:
-    types: [ "tag" ]
-    owner: concourse
-    repo: concourse-bosh-deployment
-    manifest: cluster/concourse.yml
-    vars:
-      - versions.yml
-
-github-release:
-  terraform-provider-credhub:
-    owner: orange-cloudfoundry
-    repo: terraform-provider-credhub
-  bbl:
-    owner: cloudfoundry
-    repo: bosh-bootloader
-  bosh-cli:
-    owner: cloudfoundry
-    repo: bosh-cli
-  stemcell:
-    owner: cloudfoundry
-    repo: bosh-linux-stemcell-builder
-    format:
-      match: "stable-([0-9+.]+)"
-      replace: "${1}"
+github:
+  token: <your-token-here>
+  update_interval: 4h
+  manifest_releases:
+    cf:
+      owner: cloudfoundry
+      repo: cf-deployment
+      manifest: cf-deployment.yml
+      ops:
+        - operations/use-haproxy.yml
+        - operations/backup-and-restore/enable-backup-restore.yml
+      matchers: [ "cloudfoundry(-.*)?", "cf(-.*)?" ]
+    prometheus:
+      owner: bosh-prometheus
+      repo: prometheus-boshrelease
+      manifest: manifests/prometheus.yml
+      ops:
+        - manifests/operators/enable-cf-route-registrar.yml
+        - manifests/operators/use-sqlite3.yml
+      matchers: [ "prometheus(-.*)?" ]
+    bosh:
+      owner: cloudfoundry
+      repo: bosh-deployment
+      manifest: bosh.yml
+      ops:
+        - vsphere/cpi.yml
+        - uaa.yml
+        - credhub.yml
+        - bbr.yml
+      matchers: [ "bosh(-.*)?" ]
+    concourse:
+      types: [ "tag" ]
+      owner: concourse
+      repo: concourse-bosh-deployment
+      manifest: cluster/concourse.yml
+      vars:
+        - versions.yml
+      matchers: [ "concourse(-.*)?" ]
+  generic_releases:
+    terraform-provider-credhub:
+      owner: orange-cloudfoundry
+      repo: terraform-provider-credhub
+    bbl:
+      owner: cloudfoundry
+      repo: bosh-bootloader
+    bosh-cli:
+      owner: cloudfoundry
+      repo: bosh-cli
+    stemcell:
+      owner: cloudfoundry
+      repo: bosh-linux-stemcell-builder
+      format:
+        match: "stable-([0-9+.]+)"
+        replace: "${1}"

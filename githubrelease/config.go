@@ -12,22 +12,15 @@ import (
 	"strings"
 )
 
-// type Formatter
-type Formatter struct {
-	Match   string `json:"match" yaml:"match"`
-	Replace string `json:"replace" yaml:"replace"`
+// GenericReleaseConfig -
+type GenericReleaseConfig struct {
+	Owner  string     `yaml:"owner"`
+	Repo   string     `yaml:"repo"`
+	Types  []string   `yaml:"types"`
+	Format *Formatter `yaml:"format"`
 }
 
-// GithubReleaseConfig -
-type GithubReleaseConfig struct {
-	Owner  string     `json:"owner" yaml:"owner"`
-	Repo   string     `json:"repo"  yaml:"repo"`
-	Types  []string   `json:"types" yaml:"types"`
-	Format *Formatter `json:"format" yaml:"format"`
-}
-
-// Validate -
-func (c *GithubReleaseConfig) Validate() error {
+func (c *GenericReleaseConfig) validate(name string) error {
 	if 0 == len(c.Owner) {
 		return fmt.Errorf("missing mandatory owner")
 	}
@@ -66,7 +59,7 @@ func (c *GithubReleaseConfig) Validate() error {
 }
 
 // HasType -
-func (c *GithubReleaseConfig) HasType(name string) bool {
+func (c *GenericReleaseConfig) HasType(name string) bool {
 	for _, t := range c.Types {
 		if t == name {
 			return true
@@ -75,111 +68,99 @@ func (c *GithubReleaseConfig) HasType(name string) bool {
 	return false
 }
 
-// BoshDeploymentConfig -
-type BoshDeploymentConfig struct {
-	GithubReleaseConfig `yaml:",inline"`
-	Manifest            string   `json:"manifest" yaml:"manifest"`
-	Ops                 []string `json:"ops" yaml:"ops"`
-	Vars                []string `json:"vars" yaml:"vars"`
+// ManifestReleaseConfig -
+type ManifestReleaseConfig struct {
+	GenericReleaseConfig `yaml:",inline"`
+	Manifest             string   `yaml:"manifest"`
+	Ops                  []string `yaml:"ops"`
+	Vars                 []string `yaml:"vars"`
+	Matchers             []string `yaml:"matchers"`
 }
 
-// Validate -
-func (c *BoshDeploymentConfig) Validate() error {
-	if err := c.GithubReleaseConfig.Validate(); err != nil {
+func (c *ManifestReleaseConfig) Match(name string) bool {
+	for _, m := range c.Matchers {
+		re := regexp.MustCompile(m)
+		if re.MatchString(name) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *ManifestReleaseConfig) validate(name string) error {
+	if err := c.GenericReleaseConfig.validate(name); err != nil {
 		return err
 	}
-	if 0 == len(c.Manifest) {
-		return fmt.Errorf("missing mandatory manifest")
+	if len(c.Matchers) == 0 {
+		c.Matchers = append(c.Matchers, name+"(-.*)?")
 	}
+	for _, m := range c.Matchers {
+		if _, err := regexp.Compile(m); err != nil {
+			return fmt.Errorf("invalid match regexp '%s'", m)
+		}
+	}
+	// if 0 == len(c.Manifest) {
+	// 	return fmt.Errorf("missing mandatory manifest")
+	// }
 	return nil
 }
 
-// ReleaseData -
-type ReleaseData struct {
-	HasError bool   `json:"has-error" yaml:"has-error"`
-	LastRef  string `json:"last-ref" yaml:"last-ref"`
-	Time     int64  `json:"time" yaml:"time"`
-	Version  string `json:"version" yaml:"version"`
+// GithubConfig -
+type GithubConfig struct {
+	UpdateInterval   string                            `yaml:"update_interval"`
+	Token            string                            `yaml:"token"`
+	ManifestReleases map[string]*ManifestReleaseConfig `yaml:"manifest_releases"`
+	GenericReleases  map[string]*GenericReleaseConfig  `yaml:"generic_releases"`
 }
 
-// GithubReleaseData -
-type GithubReleaseData struct {
-	GithubReleaseConfig `yaml:",inline"`
-	ReleaseData         `yaml:",inline"`
-	Name                string `json:"name" yaml:"name"`
-}
-
-// NewGithubReleaseData -
-func NewGithubReleaseData(config GithubReleaseConfig, name string) GithubReleaseData {
-	return GithubReleaseData{
-		GithubReleaseConfig: config,
-		Name:                name,
-	}
-}
-
-// BoshDeploymentData -
-type BoshDeploymentData struct {
-	BoshDeploymentConfig `yaml:",inline"`
-	ReleaseData          `yaml:",inline"`
-	Deployment           string        `json:"deployment" yaml:"deployment"`
-	Releases             []BoshRelease `json:"releases" yaml:"releases"`
-}
-
-// NewBoshDeploymentData -
-func NewBoshDeploymentData(config BoshDeploymentConfig, name string) BoshDeploymentData {
-	return BoshDeploymentData{
-		BoshDeploymentConfig: config,
-		Deployment:           name,
-	}
-}
-
-// Manifest -
-type ManifestData struct {
-	Deployment string `json:"deployment"`
-	Name       string `json:"string"`
-	Version    string `json:"version"`
-	HasError   bool   `json:"has_error"`
-}
-
-// Config -
-type Config struct {
-	Log struct {
-		JSON  bool   `json:"json"     yaml:"json"`
-		Level string `json:"level"     yaml:"level"`
-	} `json:"log"     yaml:"log"`
-
-	Bosh           BoshConfig                       `json:"bosh"             yaml:"bosh"`
-	GithubToken    string                           `json:"github-token"     yaml:"github-token"`
-	BoshDeployment map[string]*BoshDeploymentConfig `json:"bosh-deployments" yaml:"bosh-deployment"`
-	GithubRelease  map[string]*GithubReleaseConfig  `json:"github-releases"  yaml:"github-release"`
-}
-
-// Validate -
-func (c *Config) Validate() error {
-	for name, data := range c.BoshDeployment {
-		if err := data.Validate(); err != nil {
-			return fmt.Errorf("invalid bosh deployment '%s', %s", name, err)
+func (c *GithubConfig) validate() error {
+	for name, data := range c.ManifestReleases {
+		if err := data.validate(name); err != nil {
+			return fmt.Errorf("invalid manifest release '%s', %s", name, err)
 		}
 	}
-	for name, data := range c.GithubRelease {
-		if err := data.Validate(); err != nil {
-			return fmt.Errorf("invalid github release '%s', %s", name, err)
+	for name, data := range c.GenericReleases {
+		if err := data.validate(name); err != nil {
+			return fmt.Errorf("invalid generic release '%s', %s", name, err)
 		}
 	}
-	if 0 == len(c.GithubToken) {
+	if 0 == len(c.Token) {
 		return fmt.Errorf("missing mandatory github token")
 	}
 	return nil
 }
 
-// NewConfig -
+// LogConfig -
+type LogConfig struct {
+	JSON  bool   `yaml:"json"`
+	Level string `yaml:"level"`
+}
+
+// Config -
+type Config struct {
+	Log    LogConfig    `yaml:"log"`
+	Bosh   BoshConfig   `yaml:"bosh"`
+	Github GithubConfig `yaml:"github"`
+}
+
+// Validate - Validate configuration object
+func (c *Config) Validate() error {
+	if err := c.Github.validate(); err != nil {
+		return fmt.Errorf("invalid github configuration: %s", err)
+	}
+	if err := c.Bosh.validate(); err != nil {
+		return fmt.Errorf("invalid bosh configuration: %s", err)
+	}
+	return nil
+}
+
+// NewConfig - Creates and validates config from given reader
 func NewConfig(file io.Reader) *Config {
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatalf("unable to read configuration file : %s", err)
 		os.Exit(1)
 	}
-
 	config := Config{}
 	if err = yaml.Unmarshal(content, &config); err != nil {
 		if err = json.Unmarshal(content, &config); err != nil {
@@ -187,7 +168,6 @@ func NewConfig(file io.Reader) *Config {
 			os.Exit(1)
 		}
 	}
-
 	if err = config.Validate(); err != nil {
 		log.Fatalf("invalid configuration, %s", err)
 		os.Exit(1)
