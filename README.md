@@ -149,15 +149,16 @@ format:
 The exporter returns the following  metrics:
 
 
-| Metric                                         | Description                                                                                   | Labels                                                                                     |
-|------------------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| *metrics.namespace*_manifest_release           | Seconds from epoch since canonical manifest version if out-of-date, 0 means up-to-date        | `environment`, `name`, `version`, `owner`, `repo`                                          |
-| *metrics.namespace*_manifest_bosh_release_info | Information about recommended bosh releases used by last available canonical manifest release | `environment`, `manifest_name`, `onwer`, `repo`, `boshrelease_name`, `boshrelease_version` |
-| *metrics.namespace*_generic_release            | Seconds from epoch since repository version is out-of-date, 0 means up-to-date                | `environment`, `name`, `version`, `owner`, `repo`                                          |
-| *metrics.namespace*_deployment_status          | Seconds from epoch since deployment is out-of-date, , 0 means up-to-date                      | `environment`, `name`, `current`, `latest`                                                 |
-| *metrics.namespace*_last_scrape_timestamp      | Seconds from epoch since last scrape of metrics from boshupdate                               | `environment`                                                                              |
-| *metrics.namespace*_last_scrape_error          | Number of errors in last scrape of metrics                                                    | `environment`                                                                              |
-| *metrics.namespace*_last_scrape_duration       | Duration of the last scrape                                                                   | `environment`                                                                              |
+| Metric                                             | Description                                                                                   | Labels                                                                                                                                 |
+|----------------------------------------------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| *metrics.namespace*_manifest_release               | Seconds from epoch since canonical manifest version if out-of-date, 0 means up-to-date        | `environment`, `name`, `version`, `owner`, `repo`                                                                                      |
+| *metrics.namespace*_manifest_bosh_release_info     | Information about recommended bosh releases used by last available canonical manifest release | `environment`, `manifest_name`, `onwer`, `repo`, `boshrelease_name`, `boshrelease_version`, `boshrelease_url`                          |
+| *metrics.namespace*_generic_release                | Seconds from epoch since repository version is out-of-date, 0 means up-to-date                | `environment`, `name`, `version`, `owner`, `repo`                                                                                      |
+| *metrics.namespace*_deployment_status              | Seconds from epoch since deployment is out-of-date, 0 means up-to-date                        | `environment`, `name`, `current`, `latest`                                                                                             |
+| *metrics.namespace*_deployment_bosh_release_status | Seconds from epoch since bosh release is out-of-date, 0 means up-to-date                      | `environment`, `manifest_name`, `manifest_current`, `manifest_latest`, `boshrelease_name`, `boshrelease_current`, `boshrelease_latest` |
+| *metrics.namespace*_last_scrape_timestamp          | Seconds from epoch since last scrape of metrics from boshupdate                               | `environment`                                                                                                                          |
+| *metrics.namespace*_last_scrape_error              | Number of errors in last scrape of metrics                                                    | `environment`                                                                                                                          |
+| *metrics.namespace*_last_scrape_duration           | Duration of the last scrape                                                                   | `environment`                                                                                                                          |
 
 ## Contributing
 
