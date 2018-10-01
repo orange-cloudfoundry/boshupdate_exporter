@@ -64,6 +64,26 @@ func NewManager(config Config) (*Manager, error) {
 	}, nil
 }
 
+// GetGenericReleases -
+func (a *Manager) GetGenericReleases() []GenericReleaseData {
+	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
+		a.cache.generics = a.updateGenericReleases()
+		a.cache.manifests = a.updateManifestReleases()
+		a.cache.lastUpdate = time.Now()
+	}
+	return a.cache.generics
+}
+
+// GetManifestReleases -
+func (a *Manager) GetManifestReleases() []ManifestReleaseData {
+	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
+		a.cache.generics = a.updateGenericReleases()
+		a.cache.manifests = a.updateManifestReleases()
+		a.cache.lastUpdate = time.Now()
+	}
+	return a.cache.manifests
+}
+
 // GetBoshDeployments -
 func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 	entry := log.With("name", "deployments")
@@ -90,8 +110,9 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 		}
 
 		data := struct {
-			Version string `yaml:"manifest_version"`
-			Name    string `yaml:"manifest_name"`
+			Version  string        `yaml:"manifest_version"`
+			Name     string        `yaml:"manifest_name"`
+			Releases []BoshRelease `yaml:"releases"`
 		}{}
 		err = yaml.Unmarshal([]byte(manifest), &data)
 		if err != nil {
@@ -122,23 +143,16 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 		if re.MatchString(data.Version) {
 			data.Version = re.ReplaceAllString(data.Version, "${1}")
 		}
+
 		res = append(res, BoshDeploymentData{
 			Deployment:   deployment.Name(),
 			ManifestName: data.Name,
 			Ref:          data.Version,
 			HasError:     false,
+			BoshReleases: data.Releases,
 		})
 	}
 	return res, nil
-}
-
-func (a *Manager) GetGenericReleases() []GenericReleaseData {
-	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
-		a.cache.generics = a.updateGenericReleases()
-		a.cache.manifests = a.updateManifestReleases()
-		a.cache.lastUpdate = time.Now()
-	}
-	return a.cache.generics
 }
 
 func (a *Manager) updateGenericReleases() []GenericReleaseData {
@@ -172,16 +186,6 @@ func (a *Manager) updateGenericReleases() []GenericReleaseData {
 		target.LatestVersion = NewVersion(lastRef.Ref, item.Format.Format(lastRef.Ref), lastRef.Time)
 	}
 	return results
-}
-
-// GetManifestReleases -
-func (a *Manager) GetManifestReleases() []ManifestReleaseData {
-	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
-		a.cache.generics = a.updateGenericReleases()
-		a.cache.manifests = a.updateManifestReleases()
-		a.cache.lastUpdate = time.Now()
-	}
-	return a.cache.manifests
 }
 
 func (a *Manager) updateManifestReleases() []ManifestReleaseData {

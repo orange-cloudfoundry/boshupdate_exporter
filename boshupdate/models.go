@@ -49,10 +49,11 @@ func (r Version) GetStatus(latest Version) string {
 
 // BoshDeploymentData -
 type BoshDeploymentData struct {
-	Deployment   string `yaml:"deployment"`
-	ManifestName string `yaml:"manifest"`
-	Ref          string `yaml:"current"`
-	HasError     bool   `yaml:"has_error"`
+	Deployment   string        `yaml:"deployment"`
+	ManifestName string        `yaml:"manifest"`
+	Ref          string        `yaml:"current"`
+	HasError     bool          `yaml:"has_error"`
+	BoshReleases []BoshRelease `yaml:"bosh_releases"`
 }
 
 // GenericReleaseData -

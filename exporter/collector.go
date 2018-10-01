@@ -13,6 +13,7 @@ type BoshUpdateCollector struct {
 	manifestRelease                 *prometheus.GaugeVec
 	manifestBoshRelease             *prometheus.GaugeVec
 	deploymentStatus                *prometheus.GaugeVec
+	deploymentReleaseStatus         *prometheus.GaugeVec
 	genericRelease                  *prometheus.GaugeVec
 	lastScrapeTimestampMetric       prometheus.Gauge
 	lastScrapeErrorMetric           prometheus.Gauge
@@ -37,10 +38,10 @@ func NewBoshUpdateCollector(namespace string, environment string, manager *boshu
 			Namespace:   namespace,
 			Subsystem:   "",
 			Name:        "manifest_bosh_release_info",
-			Help:        "Informational metric that gives the bosh release versions requests by the lastest version of a manifest release, (always 0)",
+			Help:        "Informational metric that gives the bosh release versions requests by the latest version of a manifest release, (always 0)",
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
-		[]string{"manifest_name", "manifest_version", "owner", "repo", "boshrelease_name", "boshrelease_version"},
+		[]string{"manifest_name", "manifest_version", "owner", "repo", "boshrelease_name", "boshrelease_version", "boshrelease_url"},
 	)
 
 	genericRelease := prometheus.NewGaugeVec(
@@ -63,6 +64,17 @@ func NewBoshUpdateCollector(namespace string, environment string, manager *boshu
 			ConstLabels: prometheus.Labels{"environment": environment},
 		},
 		[]string{"deployment", "name", "current", "latest"},
+	)
+
+	deploymentReleaseStatus := prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace:   namespace,
+			Subsystem:   "",
+			Name:        "deployment_bosh_release_status",
+			Help:        "Seconds from epoch since this bosh release is out of date, (0 means up to date)",
+			ConstLabels: prometheus.Labels{"environment": environment},
+		},
+		[]string{"deployment", "manifest_name", "manifest_current", "manifest_latest", "boshrelease_name", "boshrelease_current", "boshrelease_latest"},
 	)
 
 	lastScrapeTimestampMetric := prometheus.NewGauge(
@@ -100,6 +112,7 @@ func NewBoshUpdateCollector(namespace string, environment string, manager *boshu
 		manifestRelease:                 manifestRelease,
 		manifestBoshRelease:             manifestBoshRelease,
 		deploymentStatus:                deploymentStatus,
+		deploymentReleaseStatus:         deploymentReleaseStatus,
 		genericRelease:                  genericRelease,
 		lastScrapeTimestampMetric:       lastScrapeTimestampMetric,
 		lastScrapeErrorMetric:           lastScrapeErrorMetric,
@@ -126,6 +139,17 @@ func (c BoshUpdateCollector) getVersion(
 	return nil, nil
 }
 
+func (c BoshUpdateCollector) getBoshReleaseVersion(
+	manifest *boshupdate.ManifestReleaseData,
+	boshRelease boshupdate.BoshRelease) *boshupdate.BoshRelease {
+	for _, br := range manifest.BoshReleases {
+		if br.Name == boshRelease.Name {
+			return &br
+		}
+	}
+	return nil
+}
+
 // Collect -
 func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
 	log.Debugf("collecting boshupdate metrics")
@@ -149,7 +173,7 @@ func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
 
 		for _, r := range m.BoshReleases {
 			c.manifestBoshRelease.
-				WithLabelValues(m.Name, m.LatestVersion.Version, m.Owner, m.Repo, r.Name, r.Version).
+				WithLabelValues(m.Name, m.LatestVersion.Version, m.Owner, m.Repo, r.Name, r.Version, r.URL).
 				Set(float64(0))
 		}
 	}
@@ -190,6 +214,22 @@ func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
 			c.deploymentStatus.
 				WithLabelValues(d.Deployment, manifest.Name, version.Version, manifest.LatestVersion.Version).
 				Set(float64(version.ExpiredSince))
+			for _, br := range d.BoshReleases {
+				latestBr := c.getBoshReleaseVersion(manifest, br)
+				if latestBr == nil {
+					c.deploymentReleaseStatus.
+						WithLabelValues(d.Deployment, manifest.Name, version.Version, manifest.LatestVersion.Version, br.Name, br.Version, "not-found").
+						Set(0)
+				} else {
+					value := version.ExpiredSince
+					if br.Version == latestBr.Version {
+						value = 0
+					}
+					c.deploymentReleaseStatus.
+						WithLabelValues(d.Deployment, manifest.Name, version.Version, manifest.LatestVersion.Version, br.Name, br.Version, latestBr.Version).
+						Set(float64(value))
+				}
+			}
 		}
 	}
 
@@ -199,6 +239,7 @@ func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
 	c.manifestRelease.Collect(ch)
 	c.manifestBoshRelease.Collect(ch)
 	c.deploymentStatus.Collect(ch)
+	c.deploymentReleaseStatus.Collect(ch)
 	c.genericRelease.Collect(ch)
 	c.lastScrapeTimestampMetric.Collect(ch)
 	c.lastScrapeErrorMetric.Collect(ch)
@@ -210,6 +251,7 @@ func (c BoshUpdateCollector) Describe(ch chan<- *prometheus.Desc) {
 	c.manifestRelease.Describe(ch)
 	c.manifestBoshRelease.Describe(ch)
 	c.deploymentStatus.Describe(ch)
+	c.deploymentReleaseStatus.Describe(ch)
 	c.genericRelease.Describe(ch)
 	c.lastScrapeTimestampMetric.Describe(ch)
 	c.lastScrapeErrorMetric.Describe(ch)
