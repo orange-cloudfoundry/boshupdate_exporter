@@ -35,9 +35,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// manifests := manager.GetManifestReleases()
-	// content, _ = yaml.Marshal(manifests)
-	// fmt.Println(string(content))
+	manifests := manager.GetManifestReleases()
+	content, _ = yaml.Marshal(manifests)
+	fmt.Println(string(content))
 
 	// generic := manager.GetGenericReleases()
 	// content, _ = yaml.Marshal(generic)

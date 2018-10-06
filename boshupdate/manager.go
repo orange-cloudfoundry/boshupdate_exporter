@@ -121,6 +121,7 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 				Deployment: deployment.Name(),
 				HasError:   true,
 			})
+			continue
 		}
 
 		if data.Name == "" {

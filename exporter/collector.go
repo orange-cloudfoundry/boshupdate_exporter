@@ -170,7 +170,6 @@ func (c BoshUpdateCollector) Collect(ch chan<- prometheus.Metric) {
 				WithLabelValues(m.Name, v.Version, m.Owner, m.Repo).
 				Set(float64(v.ExpiredSince))
 		}
-
 		for _, r := range m.BoshReleases {
 			c.manifestBoshRelease.
 				WithLabelValues(m.Name, m.LatestVersion.Version, m.Owner, m.Repo, r.Name, r.Version, r.URL).
