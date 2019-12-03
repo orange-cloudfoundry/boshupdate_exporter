@@ -20,7 +20,7 @@ var (
 	).Envar("BOSHUPDATE_EXPORTER_METRICS_NAMESPACE").Default("boshupdate").String()
 
 	metricsEnvironment = kingpin.Flag(
-		"metrics.environment", "Credhub environment label to be attached to metrics ($BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT)",
+		"metrics.environment", "Boshupdate environment label to be attached to metrics ($BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT)",
 	).Envar("BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT").Required().String()
 
 	listenAddress = kingpin.Flag(
@@ -103,9 +103,9 @@ func main() {
 	http.Handle(*metricsPath, handler)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
-             <head><title>Credhub Exporter</title></head>
+             <head><title>Boshupdate Exporter</title></head>
              <body>
-             <h1>Credhub Exporter</h1>
+             <h1>Boshupdate Exporter</h1>
              <p><a href='` + *metricsPath + `'>Metrics</a></p>
              </body>
              </html>`))
