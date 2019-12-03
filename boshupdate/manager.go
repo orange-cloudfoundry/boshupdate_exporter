@@ -3,6 +3,7 @@ package boshupdate
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"github.com/cloudfoundry/bosh-cli/director"
 	boshtpl "github.com/cloudfoundry/bosh-cli/director/template"
 	"github.com/cppforlife/go-patch/patch"
@@ -287,8 +288,26 @@ func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 	}
 
 	sort.Slice(res[:], func(i, j int) bool {
-		return res[i].Time > res[j].Time
+
+		// if version tags are not standard, they are sorted by Time
+		re := regexp.MustCompile(".+v(.*)")
+		if re.MatchString(res[i].Ref) || re.MatchString(res[j].Ref) {
+			return res[i].Time > res[j].Time
+		}
+
+		v1, err := semver.NewVersion(res[i].Ref)
+		if err != nil {
+			log.Errorf("Error parsing version: %s", res[i].Ref)
+			return true
+		}
+		v2, err := semver.NewVersion(res[j].Ref)
+		if err != nil {
+			log.Errorf("Error parsing version: %s", res[j].Ref)
+			return true
+		}
+		return v1.Compare(v2) > 0
 	})
+
 	return res, nil
 }
 
