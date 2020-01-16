@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net/http"
 	"os"
+	"time"
 )
 
 var (
@@ -48,10 +49,6 @@ var (
 	).Envar("BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE").ExistingFile()
 )
 
-func init() {
-	prometheus.MustRegister(version.NewCollector(*metricsNamespace))
-}
-
 type basicAuthHandler struct {
 	handler  http.HandlerFunc
 	username string
@@ -70,16 +67,14 @@ func (h *basicAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func prometheusHandler() http.Handler {
-	handler := prometheus.Handler()
-
+	handler := promhttp.Handler()
 	if *authUsername != "" && *authPassword != "" {
 		handler = &basicAuthHandler{
-			handler:  prometheus.Handler().ServeHTTP,
+			handler:  promhttp.Handler().ServeHTTP,
 			username: *authUsername,
 			password: *authPassword,
 		}
 	}
-
 	return handler
 }
 
@@ -95,12 +90,15 @@ func main() {
 	config := boshupdate.NewConfig(*configFile)
 	manager, err := boshupdate.NewManager(*config)
 	if err != nil {
+		log.Errorln(err)
 		os.Exit(1)
 	}
-	collector := NewBoshUpdateCollector(*metricsNamespace, *metricsEnvironment, manager)
-	prometheus.MustRegister(collector)
-	handler := prometheusHandler()
-	http.Handle(*metricsPath, handler)
+
+	initMetricsReporter(*metricsNamespace, *metricsEnvironment)
+
+	interval, _ := time.ParseDuration(config.Github.UpdateInterval)
+	startUpdate(manager, interval)
+	http.Handle(*metricsPath, prometheusHandler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
              <head><title>Boshupdate Exporter</title></head>

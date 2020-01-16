@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // GenericReleaseConfig -
@@ -127,6 +128,11 @@ func (c *GithubConfig) validate() error {
 	if 0 == len(c.Token) {
 		return fmt.Errorf("missing mandatory github token")
 	}
+	_, err := time.ParseDuration(c.UpdateInterval)
+	if err != nil {
+		return fmt.Errorf("invalid duration format for update_interval")
+	}
+
 	return nil
 }
 

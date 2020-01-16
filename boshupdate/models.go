@@ -16,6 +16,12 @@ func (s *Formatter) Format(ref string) string {
 	return re.ReplaceAllString(ref, s.Replace)
 }
 
+// Match -
+func (s *Formatter) DoesMatch(ref string) bool {
+	re := regexp.MustCompile(s.Match)
+	return re.MatchString(ref)
+}
+
 // GithubRef -
 type GithubRef struct {
 	Ref  string
@@ -94,7 +100,7 @@ type ManifestReleaseData struct {
 func NewManifestReleaseData(config ManifestReleaseConfig, name string) ManifestReleaseData {
 	return ManifestReleaseData{
 		ManifestReleaseConfig: config,
-		Name: name,
+		Name:                  name,
 	}
 }
 

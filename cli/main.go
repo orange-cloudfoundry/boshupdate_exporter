@@ -37,11 +37,13 @@ func main() {
 
 	manifests := manager.GetManifestReleases()
 	content, _ = yaml.Marshal(manifests)
+	fmt.Println("fetched manifest releases:")
 	fmt.Println(string(content))
 
-	// generic := manager.GetGenericReleases()
-	// content, _ = yaml.Marshal(generic)
-	// fmt.Println(string(content))
+	generic := manager.GetGenericReleases()
+	content, _ = yaml.Marshal(generic)
+	fmt.Println("fetched generic releases:")
+	fmt.Println(string(content))
 
 	deployments, err := manager.GetBoshDeployments()
 	if err != nil {
@@ -49,5 +51,6 @@ func main() {
 		os.Exit(1)
 	}
 	content, _ = yaml.Marshal(deployments)
+	fmt.Println("fetched deployments:")
 	fmt.Println(string(content))
 }

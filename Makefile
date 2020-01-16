@@ -9,7 +9,7 @@ TARBALLS_DIR            ?= $(shell pwd)/.tarballs
 DOCKER_IMAGE_NAME       ?= boshupdate-exporter
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
-all: format build test
+all: format build
 
 deps:
 	@$(GO) get github.com/onsi/ginkgo/ginkgo
@@ -27,10 +27,6 @@ vet:
 	@echo ">> vetting code"
 	@$(GO) vet $(pkgs)
 
-test: deps
-	@echo ">> running tests"
-	@$(GINKGO) version
-	@$(GINKGO) -r -race .
 
 promu:
 	@GOOS=$(shell uname -s | tr A-Z a-z) \
@@ -61,4 +57,4 @@ docker:
 	@echo ">> building docker image"
 	@docker build -t "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
 
-.PHONY: all deps format style vet test promu build crossbuild tarball tarballs release docker
+.PHONY: all deps format style vet promu build crossbuild tarball tarballs release docker

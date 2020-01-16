@@ -4,11 +4,11 @@ log:
 
 bosh:
   log_level: error
-  url: https://10.0.0.6:25555
-  ca_cert: <path-to-bosh-ca-cert>
-  client_id: admin
-  client_secret: <secret>
-  proxy: <proxy if any>
+  url: https://10.0.0.6:25555     # or env BOSH_ENVIRONMENT
+  ca_cert: <path-to-bosh-ca-cert> # or value in env BOSH_CA_CERT
+  client_id: admin                # or env BOSH_CLIENT
+  client_secret: <secret>         # or env BOSH_CLIENT_SECRET
+  proxy: <proxy if any>           # or env BOSH_ALL_PROXY
   excludes:
     - compilation
 
@@ -32,16 +32,6 @@ github:
         - manifests/operators/enable-cf-route-registrar.yml
         - manifests/operators/use-sqlite3.yml
       matchers: [ "prometheus(-.*)?" ]
-    bosh:
-      owner: cloudfoundry
-      repo: bosh-deployment
-      manifest: bosh.yml
-      ops:
-        - vsphere/cpi.yml
-        - uaa.yml
-        - credhub.yml
-        - bbr.yml
-      matchers: [ "bosh(-.*)?" ]
     concourse:
       types: [ "tag" ]
       owner: concourse
@@ -64,5 +54,5 @@ github:
       owner: cloudfoundry
       repo: bosh-linux-stemcell-builder
       format:
-        match: "stable-([0-9+.]+)"
+        match: "ubuntu-xenial/v([0-9+.]+)"
         replace: "${1}"
