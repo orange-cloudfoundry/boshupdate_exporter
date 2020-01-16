@@ -6,6 +6,7 @@ import (
 	"net/http"
 	gourl "net/url"
 
+	urlhelper "github.com/cloudfoundry/bosh-cli/common/util"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	semver "github.com/cppforlife/go-semi-semantic/version"
 )
@@ -117,11 +118,7 @@ func (d DirectorImpl) FindStemcell(slug StemcellSlug) (Stemcell, error) {
 	return stem, nil
 }
 
-func (d DirectorImpl) HasStemcell(name, version string) (bool, error) {
-	return d.client.HasStemcell(name, version)
-}
-
-func (d DirectorImpl) StemcellNeedsUpload(stemcells StemcellInfo) (bool, bool, error) {
+func (d DirectorImpl) StemcellNeedsUpload(stemcells StemcellInfo) (bool, error) {
 	return d.client.StemcellNeedsUpload(stemcells)
 }
 
@@ -159,34 +156,25 @@ func (c Client) HasStemcell(name, version string) (bool, error) {
 	return false, nil
 }
 
-func (c Client) StemcellNeedsUpload(stemcells StemcellInfo) (bool, bool, error) {
+func (c Client) StemcellNeedsUpload(stemcells StemcellInfo) (bool, error) {
 	setHeaders := func(req *http.Request) {
 		req.Header.Add("Content-Type", "application/json")
 	}
 
 	jsonBody, err := json.Marshal(map[string]StemcellInfo{"stemcell": stemcells})
 	if err != nil {
-		return false, true, err
-	}
-
-	respBody, response, err := c.clientRequest.RawPost("/stemcell_uploads", jsonBody, setHeaders)
-	if err != nil {
-		if response.StatusCode == http.StatusNotFound {
-			return false, false, bosherr.WrapErrorf(err, "Finding stemcells")
-		}
-		return false, true, bosherr.WrapErrorf(err, "Finding stemcells")
+		return false, err
 	}
 
 	var parsedResponse struct {
 		Needed bool
 	}
-
-	err = json.Unmarshal(respBody, &parsedResponse)
+	err = c.clientRequest.Post("/stemcell_uploads", jsonBody, setHeaders, &parsedResponse)
 	if err != nil {
-		return false, true, bosherr.WrapError(err, "Unmarshaling stemcell matches")
+		return false, bosherr.WrapErrorf(err, "Finding stemcells")
 	}
 
-	return parsedResponse.Needed, true, nil
+	return parsedResponse.Needed, nil
 }
 
 func (c Client) UploadStemcellURL(url, sha1 string, fix bool) error {
@@ -219,7 +207,7 @@ func (c Client) UploadStemcellURL(url, sha1 string, fix bool) error {
 
 	_, err = c.taskClientRequest.PostResult(path, reqBody, setHeaders)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Uploading remote stemcell '%s'", url)
+		return bosherr.WrapErrorf(err, "Uploading remote stemcell '%s'", urlhelper.RedactBasicAuth(url))
 	}
 
 	return nil

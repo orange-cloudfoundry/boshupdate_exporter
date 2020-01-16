@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/bosh-cli/director"
 	"github.com/cloudfoundry/bosh-cli/uaa"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/cloudfoundry/bosh-utils/system"
+	"io/ioutil"
 	"os"
 	"regexp"
 )
@@ -25,8 +25,32 @@ type BoshConfig struct {
 
 func (c *BoshConfig) validate() error {
 	if len(c.URL) == 0 {
-		return fmt.Errorf("missing mandatory url")
+		c.URL = os.Getenv("BOSH_ENVIRONMENT")
+		if len(c.URL) == 0 {
+			return fmt.Errorf("missing mandatory url")
+		}
 	}
+
+	if len(c.ClientID) == 0 {
+		c.ClientID = os.Getenv("BOSH_CLIENT")
+	}
+	if len(c.ClientSecret) == 0 {
+		c.ClientSecret = os.Getenv("BOSH_CLIENT_SECRET")
+	}
+	if len(c.CaCert) == 0 {
+		c.CaCert = os.Getenv("BOSH_CA_CERT")
+	} else {
+		val, err := ioutil.ReadFile(c.CaCert)
+		if err != nil {
+			return fmt.Errorf("unable to read file at path %s", c.CaCert)
+		}
+		c.CaCert = string(val)
+	}
+
+	if len(c.Proxy) == 0 {
+		c.Proxy = os.Getenv("BOSH_ALL_PROXY")
+	}
+
 	for _, f := range c.Excludes {
 		if _, err := regexp.Compile(f); err != nil {
 			return fmt.Errorf("invalid exclude filter regexp '%s'", f)
@@ -45,20 +69,40 @@ func (c *BoshConfig) IsExcluded(name string) bool {
 	return false
 }
 
-func readCACert(CACertFile string, logger logger.Logger) (string, error) {
-	if CACertFile != "" {
-		fs := system.NewOsFileSystem(logger)
-		CACertFileFullPath, err := fs.ExpandPath(CACertFile)
-		if err != nil {
-			return "", err
-		}
-		CACert, err := fs.ReadFileString(CACertFileFullPath)
-		if err != nil {
-			return "", err
-		}
-		return CACert, nil
+func buildLogger(config BoshConfig) (logger.Logger, error) {
+	level, err := logger.Levelify(config.LogLevel)
+	if err != nil {
+		return nil, err
 	}
-	return "", nil
+	logger := logger.NewLogger(level)
+	return logger, nil
+}
+
+func buildUAA(url string, config BoshConfig, logger logger.Logger) (uaa.UAA, error) {
+	uaaConfig, err := uaa.NewConfigFromURL(url)
+	if err != nil {
+		return nil, err
+	}
+	uaaConfig.CACert = config.CaCert
+	uaaConfig.Client = config.ClientID
+	uaaConfig.ClientSecret = config.ClientSecret
+	uaaFactory := uaa.NewFactory(logger)
+	return uaaFactory.New(uaaConfig)
+}
+
+func getDirectorInfo(config BoshConfig, logger logger.Logger) (*director.Info, error) {
+	directorConfig, err := director.NewConfigFromURL(config.URL)
+	if err != nil {
+		return nil, err
+	}
+	directorConfig.CACert = config.CaCert
+	factory := director.NewFactory(logger)
+	anonymousDirector, err := factory.New(directorConfig, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	info, err := anonymousDirector.Info()
+	return &info, err
 }
 
 // NewDirector -
@@ -67,89 +111,34 @@ func NewDirector(config BoshConfig) (director.Director, error) {
 		os.Setenv("BOSH_ALL_PROXY", config.Proxy)
 	}
 
-	level, err := logger.Levelify(config.LogLevel)
+	logger, err := buildLogger(config)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logger.NewLogger(level)
+	infos, err := getDirectorInfo(config, logger)
+	if err != nil {
+		return nil, err
+	}
+
 	directorConfig, err := director.NewConfigFromURL(config.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	boshCACert, err := readCACert(config.CaCert, logger)
-	if err != nil {
-		return nil, err
-	}
-	directorConfig.CACert = boshCACert
-
-	anonymousDirector, err := director.NewFactory(logger).New(directorConfig, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	boshInfo, err := anonymousDirector.Info()
-	if err != nil {
-		return nil, err
-	}
-
-	if boshInfo.Auth.Type != "uaa" {
+	directorConfig.CACert = config.CaCert
+	if infos.Auth.Type != "uaa" {
 		directorConfig.Client = config.Username
 		directorConfig.ClientSecret = config.Password
 	} else {
-		uaaURL := boshInfo.Auth.Options["url"]
+		uaaURL := infos.Auth.Options["url"]
 		uaaURLStr, ok := uaaURL.(string)
 		if !ok {
 			return nil, fmt.Errorf("Expected UAA URL '%s' to be a string", uaaURL)
 		}
-		uaaConfig, err := uaa.NewConfigFromURL(uaaURLStr)
+		uaaCli, err := buildUAA(uaaURLStr, config, logger)
 		if err != nil {
 			return nil, err
 		}
-		uaaConfig.CACert = boshCACert
-
-		if config.ClientID != "" && config.ClientSecret != "" {
-			uaaConfig.Client = config.ClientID
-			uaaConfig.ClientSecret = config.ClientSecret
-		} else {
-			uaaConfig.Client = "bosh_cli"
-		}
-
-		uaaFactory := uaa.NewFactory(logger)
-		uaaClient, err := uaaFactory.New(uaaConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		if config.ClientID != "" && config.ClientSecret != "" {
-			directorConfig.TokenFunc = uaa.NewClientTokenSession(uaaClient).TokenFunc
-		} else {
-			answers := []uaa.PromptAnswer{
-				uaa.PromptAnswer{
-					Key:   "username",
-					Value: config.Username,
-				},
-				uaa.PromptAnswer{
-					Key:   "password",
-					Value: config.Password,
-				},
-			}
-			accessToken, err := uaaClient.OwnerPasswordCredentialsGrant(answers)
-			if err != nil {
-				return nil, err
-			}
-
-			origToken := uaaClient.NewStaleAccessToken(accessToken.RefreshToken().Value())
-			directorConfig.TokenFunc = uaa.NewAccessTokenSession(origToken).TokenFunc
-		}
+		directorConfig.TokenFunc = uaa.NewClientTokenSession(uaaCli).TokenFunc
 	}
 
-	boshFactory := director.NewFactory(logger)
-	boshClient, err := boshFactory.New(directorConfig, director.NewNoopTaskReporter(), director.NewNoopFileReporter())
-	if err != nil {
-		return nil, err
-	}
-
-	return boshClient, nil
+	factory := director.NewFactory(logger)
+	return factory.New(directorConfig, director.NewNoopTaskReporter(), director.NewNoopFileReporter())
 }

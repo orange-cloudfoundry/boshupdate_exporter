@@ -15,15 +15,7 @@ import (
 	"io/ioutil"
 	"regexp"
 	"sort"
-	"time"
 )
-
-type cache struct {
-	ttl        time.Duration
-	lastUpdate time.Time
-	generics   []GenericReleaseData
-	manifests  []ManifestReleaseData
-}
 
 // Manager -
 type Manager struct {
@@ -31,7 +23,6 @@ type Manager struct {
 	client   *github.Client
 	ctx      context.Context
 	director director.Director
-	cache    cache
 }
 
 // NewManager -
@@ -46,43 +37,12 @@ func NewManager(config Config) (*Manager, error) {
 		return nil, errors.Wrapf(err, "unable to create director client")
 	}
 
-	ttl, err := time.ParseDuration(config.Github.UpdateInterval)
-	if err != nil {
-		return nil, errors.Wrapf(err, "invalid github interval duration '%s'", config.Github.UpdateInterval)
-	}
-
 	return &Manager{
 		config:   config,
 		client:   github.NewClient(tc),
 		ctx:      ctx,
 		director: director,
-		cache: cache{
-			ttl:        ttl,
-			lastUpdate: time.Unix(0, 0),
-			generics:   []GenericReleaseData{},
-			manifests:  []ManifestReleaseData{},
-		},
 	}, nil
-}
-
-// GetGenericReleases -
-func (a *Manager) GetGenericReleases() []GenericReleaseData {
-	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
-		a.cache.generics = a.updateGenericReleases()
-		a.cache.manifests = a.updateManifestReleases()
-		a.cache.lastUpdate = time.Now()
-	}
-	return a.cache.generics
-}
-
-// GetManifestReleases -
-func (a *Manager) GetManifestReleases() []ManifestReleaseData {
-	if time.Since(a.cache.lastUpdate) > a.cache.ttl {
-		a.cache.generics = a.updateGenericReleases()
-		a.cache.manifests = a.updateManifestReleases()
-		a.cache.lastUpdate = time.Now()
-	}
-	return a.cache.manifests
 }
 
 // GetBoshDeployments -
@@ -157,7 +117,8 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 	return res, nil
 }
 
-func (a *Manager) updateGenericReleases() []GenericReleaseData {
+// GetGenericReleases -
+func (a *Manager) GetGenericReleases() []GenericReleaseData {
 	results := []GenericReleaseData{}
 	for name, item := range a.config.Github.GenericReleases {
 		entry := log.
@@ -190,7 +151,8 @@ func (a *Manager) updateGenericReleases() []GenericReleaseData {
 	return results
 }
 
-func (a *Manager) updateManifestReleases() []ManifestReleaseData {
+// GetManifestReleases -
+func (a *Manager) GetManifestReleases() []ManifestReleaseData {
 	results := []ManifestReleaseData{}
 
 	for name, item := range a.config.Github.ManifestReleases {
@@ -255,6 +217,28 @@ func (a *Manager) updateManifestReleases() []ManifestReleaseData {
 	return results
 }
 
+func (a *Manager) listReleases(item GenericReleaseConfig) ([]*github.RepositoryRelease, error) {
+	res := []*github.RepositoryRelease{}
+	opts := github.ListOptions{
+		Page:    1,
+		PerPage: 100,
+	}
+
+	for {
+		data, resp, err := a.client.Repositories.ListReleases(a.ctx, item.Owner, item.Repo, &opts)
+		if err != nil {
+			return res, err
+		}
+		for _, d := range data {
+			res = append(res, d)
+		}
+		if resp.NextPage == 0 {
+			return res, nil
+		}
+		opts.Page++
+	}
+}
+
 // 1. For some reason, we get empty date when reading tag object
 //    We fetch information for corresponding sha to get tag date
 func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
@@ -262,7 +246,7 @@ func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 	release := item.HasType("release")
 	preRelease := item.HasType("pre_release")
 	draftRelease := item.HasType("draft_release")
-	releases, _, err := a.client.Repositories.ListReleases(a.ctx, item.Owner, item.Repo, nil)
+	releases, err := a.listReleases(item)
 	if err != nil {
 		return res, errors.Wrapf(err, "unable to fetch releases from %s/%s", item.Owner, item.Repo)
 	}
@@ -270,7 +254,12 @@ func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 		if (r.GetPrerelease() == preRelease) ||
 			(r.GetDraft() == draftRelease) ||
 			(!r.GetPrerelease() && !r.GetDraft() && release) {
-			res = append(res, GithubRef{r.GetTagName(), r.GetCreatedAt().Unix()})
+			if item.Format.DoesMatch(r.GetTagName()) {
+				res = append(res, GithubRef{
+					r.GetTagName(),
+					r.GetCreatedAt().Unix(),
+				})
+			}
 		}
 	}
 
@@ -283,29 +272,23 @@ func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 			// 1.
 			sha1 := t.GetCommit().GetSHA()
 			commit, _, _ := a.client.Repositories.GetCommit(a.ctx, item.Owner, item.Repo, sha1)
-			res = append(res, GithubRef{t.GetName(), commit.GetCommit().GetCommitter().GetDate().Unix()})
+			res = append(res, GithubRef{
+				t.GetName(),
+				commit.GetCommit().GetCommitter().GetDate().Unix(),
+			})
 		}
 	}
 
 	sort.Slice(res[:], func(i, j int) bool {
-
-		// if version tags are not standard, they are sorted by Time
-		re := regexp.MustCompile(".+v(.*)")
-		if re.MatchString(res[i].Ref) || re.MatchString(res[j].Ref) {
+		vi := item.Format.Format(res[i].Ref)
+		vj := item.Format.Format(res[j].Ref)
+		semvi, erri := semver.NewVersion(vi)
+		semvj, errj := semver.NewVersion(vj)
+		// release time is used when could not extract semver
+		if erri != nil || errj != nil {
 			return res[i].Time > res[j].Time
 		}
-
-		v1, err := semver.NewVersion(res[i].Ref)
-		if err != nil {
-			log.Errorf("Error parsing version: %s", res[i].Ref)
-			return true
-		}
-		v2, err := semver.NewVersion(res[j].Ref)
-		if err != nil {
-			log.Errorf("Error parsing version: %s", res[j].Ref)
-			return true
-		}
-		return v1.Compare(v2) > 0
+		return semvi.Compare(semvj) > 0
 	})
 
 	return res, nil
