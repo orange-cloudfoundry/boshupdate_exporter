@@ -16,3 +16,5 @@ boshupdate_exporter
 boshupdate_cli
 .tarballs/
 .build/
+cli/cli
+exporter/exporter
