@@ -18,3 +18,4 @@ boshupdate_cli
 .build/
 cli/cli
 exporter/exporter
+/dist

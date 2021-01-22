@@ -1,0 +1,54 @@
+project_name: boshupdate_exporter
+
+builds:
+  -
+    &template
+    id: exporter
+    dir: exporter
+    binary: boshupdate_exporter
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/prometheus/common/version.Version={{.Version}}
+      - -X github.com/prometheus/common/version.Revision={{.FullCommit}}
+      - -X github.com/prometheus/common/version.Branch={{.Branch}}
+      - -X github.com/prometheus/common/version.BuildUser={{.Env.USER}}
+      - -X github.com/prometheus/common/version.BuildDate={{.Date}}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+  -
+    <<: *template
+    id: cli
+    dir: cli
+    binary: boshupdate_cli
+
+archives:
+  - id: archives
+    builds: [ exporter, cli ]
+    format: "tar.gz"
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    wrap_in_directory: true
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/*
+      - assets/*
+      - static/*
+      - templates/*
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+release:
+  github:
+    owner: orange-cloudfoundry
+    name: boshupdate_exporter
+  prerelease: auto
+  name_template: '{{.Tag}}'
