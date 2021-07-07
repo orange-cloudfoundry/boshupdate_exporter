@@ -9,7 +9,7 @@ import (
 	"github.com/cppforlife/go-patch/patch"
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -47,7 +47,7 @@ func NewManager(config Config) (*Manager, error) {
 
 // GetBoshDeployments -
 func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
-	entry := log.With("name", "deployments")
+	entry := log.WithField("name", "deployments")
 	entry.Debugf("processing bosh deployments")
 
 	res := []BoshDeploymentData{}
@@ -121,10 +121,11 @@ func (a *Manager) GetBoshDeployments() ([]BoshDeploymentData, error) {
 func (a *Manager) GetGenericReleases() []GenericReleaseData {
 	results := []GenericReleaseData{}
 	for name, item := range a.config.Github.GenericReleases {
-		entry := log.
-			With("name", name).
-			With("repo", item.Repo).
-			With("owner", item.Owner)
+		entry := log.WithFields(log.Fields{
+			"name": name,
+			"repo": item.Repo,
+			"owner": item.Owner,
+		})
 		entry.Debugf("processing github release")
 
 		results = append(results, NewGenericReleaseData(*item, name))
@@ -159,10 +160,11 @@ func (a *Manager) GetManifestReleases() []ManifestReleaseData {
 		results = append(results, NewManifestReleaseData(*item, name))
 		target := &results[len(results)-1]
 
-		entry := log.
-			With("deployment", name).
-			With("repo", item.Repo).
-			With("owner", item.Owner)
+		entry := log.WithFields(log.Fields{
+			"deployment": name,
+			"repo": item.Repo,
+			"owner": item.Owner,
+		})
 		entry.Debugf("processing bosh deployment")
 
 		entry.Debugf("fetching release list")
@@ -182,11 +184,12 @@ func (a *Manager) GetManifestReleases() []ManifestReleaseData {
 		target.Versions = a.createVersions(refs, *lastRef, item.GenericReleaseConfig)
 		target.LatestVersion = NewVersion(lastRef.Ref, item.Format.Format(lastRef.Ref), lastRef.Time)
 
-		entry = log.
-			With("deployment", name).
-			With("repo", item.Repo).
-			With("owner", item.Owner).
-			With("version", target.LatestVersion.Version)
+		entry = log.WithFields(log.Fields{
+			"deployment": name,
+			"repo": item.Repo,
+			"owner": item.Owner,
+			"version": target.LatestVersion.Version,
+		})
 
 		if len(item.Manifest) == 0 {
 			continue
@@ -331,10 +334,11 @@ func (a *Manager) createVersions(refs []GithubRef, last GithubRef, item GenericR
 
 // RenderManifest -
 func (a *Manager) RenderManifest(manifest []byte, item ManifestReleaseData) ([]byte, error) {
-	entry := log.
-		With("name", item.Name).
-		With("repo", item.Repo).
-		With("owner", item.Owner)
+	entry := log.WithFields(log.Fields{
+		"name": item.Name,
+		"repo": item.Repo,
+		"owner": item.Owner,
+	})
 	entry.Debugf("rendering final manifest")
 
 	tpl := boshtpl.NewTemplate(manifest)

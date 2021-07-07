@@ -4,7 +4,7 @@ import (
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 

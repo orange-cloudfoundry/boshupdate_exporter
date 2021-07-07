@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/prometheus/common/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"gopkg.in/yaml.v2"
@@ -12,6 +12,15 @@ import (
 
 var (
 	configFile = kingpin.Flag("config", "Configuration file path").Required().File()
+	logLevel = kingpin.Flag(
+		"log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]",
+	).Default("info").String()
+	logStream = kingpin.Flag(
+		"log.stream", "Write log to given stream. Valid streams: [stdout, stderr]",
+	).Default("stderr").String()
+	logJson = kingpin.Flag(
+		"log.json", "When given, write log in json format",
+	).Bool()
 )
 
 func main() {
@@ -19,14 +28,18 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
-	log.Base().SetFormat("logger://stderr")
-	log.Base().SetLevel("error")
-
-	config := boshupdate.NewConfig(*configFile)
-	log.Base().SetLevel(config.Log.Level)
-	if config.Log.JSON {
-		log.Base().SetFormat("logger://stderr?json=true")
+	log.SetLevel(log.ErrorLevel)
+	if lvl, err := log.ParseLevel(*logLevel); err == nil {
+		log.SetLevel(lvl)
 	}
+	log.SetOutput(os.Stderr)
+	if *logStream == "stdout" {
+		log.SetOutput(os.Stdout)
+	}
+	if *logJson {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+	config := boshupdate.NewConfig(*configFile)
 
 	var content []byte
 	manager, err := boshupdate.NewManager(*config)

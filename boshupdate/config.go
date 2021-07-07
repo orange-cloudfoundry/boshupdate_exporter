@@ -3,7 +3,7 @@ package boshupdate
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
