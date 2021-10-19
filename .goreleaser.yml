@@ -1,11 +1,9 @@
 project_name: boshupdate_exporter
 
 builds:
-  -
-    &template
-    id: exporter
-    dir: exporter
+  - id: binary
     binary: boshupdate_exporter
+    dir: .
     env:
       - CGO_ENABLED=0
     ldflags:
@@ -21,26 +19,20 @@ builds:
       - darwin
     goarch:
       - amd64
-  -
-    <<: *template
-    id: cli
-    dir: cli
-    binary: boshupdate_cli
 
 archives:
   - id: archives
-    builds: [ exporter, cli ]
+    builds:
+      - binary
     format: "tar.gz"
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     wrap_in_directory: true
-    files:
-      - LICENSE*
-      - README*
-      - CHANGELOG*
-      - docs/*
-      - assets/*
-      - static/*
-      - templates/*
+  - id: archives-zip
+    builds:
+      - binary
+    format: "zip"
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    wrap_in_directory: true
 
 checksum:
   name_template: checksums.txt
