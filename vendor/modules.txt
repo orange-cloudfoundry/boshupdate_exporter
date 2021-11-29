@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/tlsconfig v0.0.0-20210615191307-5d92ef3894a7
+# code.cloudfoundry.org/tlsconfig v0.0.0-20211123175040-23cc9f05b6b3
 ## explicit; go 1.16
 code.cloudfoundry.org/tlsconfig
 # github.com/Masterminds/semver v1.5.0
@@ -30,7 +30,7 @@ github.com/cloudfoundry/bosh-cli/director
 github.com/cloudfoundry/bosh-cli/director/template
 github.com/cloudfoundry/bosh-cli/io
 github.com/cloudfoundry/bosh-cli/uaa
-# github.com/cloudfoundry/bosh-utils v0.0.291
+# github.com/cloudfoundry/bosh-utils v0.0.292
 ## explicit; go 1.17
 github.com/cloudfoundry/bosh-utils/crypto
 github.com/cloudfoundry/bosh-utils/errors
@@ -43,7 +43,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.32
+# github.com/cloudfoundry/socks5-proxy v0.2.33
 ## explicit; go 1.17
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -119,7 +119,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20211118161319-6a13c67c3ce4
+# golang.org/x/net v0.0.0-20211123203042-d83791d6bcd9
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -129,7 +129,7 @@ golang.org/x/net/proxy
 ## explicit; go 1.11
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1
+# golang.org/x/sys v0.0.0-20211124211545-fe61309f8881
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
