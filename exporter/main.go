@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
 	"github.com/prometheus/common/version"
-	"github.com/alecthomas/kingpin/v2"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"time"
