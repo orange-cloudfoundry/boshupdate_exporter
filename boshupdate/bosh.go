@@ -5,7 +5,6 @@ import (
 	"github.com/cloudfoundry/bosh-cli/director"
 	"github.com/cloudfoundry/bosh-cli/uaa"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"io/ioutil"
 	"os"
 	"regexp"
 )
@@ -40,7 +39,7 @@ func (c *BoshConfig) validate() error {
 	if len(c.CaCert) == 0 {
 		c.CaCert = os.Getenv("BOSH_CA_CERT")
 	} else {
-		val, err := ioutil.ReadFile(c.CaCert)
+		val, err := os.ReadFile(c.CaCert)
 		if err != nil {
 			return fmt.Errorf("unable to read file at path %s", c.CaCert)
 		}
@@ -74,8 +73,7 @@ func buildLogger(config BoshConfig) (logger.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	logger := logger.NewLogger(level)
-	return logger, nil
+	return logger.NewLogger(level), nil
 }
 
 func buildUAA(url string, config BoshConfig, logger logger.Logger) (uaa.UAA, error) {
@@ -111,12 +109,12 @@ func NewDirector(config BoshConfig) (director.Director, error) {
 		os.Setenv("BOSH_ALL_PROXY", config.Proxy)
 	}
 
-	logger, err := buildLogger(config)
+	log, err := buildLogger(config)
 	if err != nil {
 		return nil, err
 	}
 
-	infos, err := getDirectorInfo(config, logger)
+	infos, err := getDirectorInfo(config, log)
 	if err != nil {
 		return nil, err
 	}
@@ -132,13 +130,13 @@ func NewDirector(config BoshConfig) (director.Director, error) {
 		if !ok {
 			return nil, fmt.Errorf("Expected UAA URL '%s' to be a string", uaaURL)
 		}
-		uaaCli, err := buildUAA(uaaURLStr, config, logger)
+		uaaCli, err := buildUAA(uaaURLStr, config, log)
 		if err != nil {
 			return nil, err
 		}
 		directorConfig.TokenFunc = uaa.NewClientTokenSession(uaaCli).TokenFunc
 	}
 
-	factory := director.NewFactory(logger)
+	factory := director.NewFactory(log)
 	return factory.New(directorConfig, director.NewNoopTaskReporter(), director.NewNoopFileReporter())
 }

@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"io"
 	"regexp"
 	"sort"
 )
@@ -32,7 +32,7 @@ func NewManager(config Config) (*Manager, error) {
 		&oauth2.Token{AccessToken: config.Github.Token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	director, err := NewDirector(config.Bosh)
+	newDirector, err := NewDirector(config.Bosh)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to create director client")
 	}
@@ -41,7 +41,7 @@ func NewManager(config Config) (*Manager, error) {
 		config:   config,
 		client:   github.NewClient(tc),
 		ctx:      ctx,
-		director: director,
+		director: newDirector,
 	}, nil
 }
 
@@ -122,8 +122,8 @@ func (a *Manager) GetGenericReleases() []GenericReleaseData {
 	results := []GenericReleaseData{}
 	for name, item := range a.config.Github.GenericReleases {
 		entry := log.WithFields(log.Fields{
-			"name": name,
-			"repo": item.Repo,
+			"name":  name,
+			"repo":  item.Repo,
 			"owner": item.Owner,
 		})
 		entry.Debugf("processing github release")
@@ -162,8 +162,8 @@ func (a *Manager) GetManifestReleases() []ManifestReleaseData {
 
 		entry := log.WithFields(log.Fields{
 			"deployment": name,
-			"repo": item.Repo,
-			"owner": item.Owner,
+			"repo":       item.Repo,
+			"owner":      item.Owner,
 		})
 		entry.Debugf("processing bosh deployment")
 
@@ -186,9 +186,9 @@ func (a *Manager) GetManifestReleases() []ManifestReleaseData {
 
 		entry = log.WithFields(log.Fields{
 			"deployment": name,
-			"repo": item.Repo,
-			"owner": item.Owner,
-			"version": target.LatestVersion.Version,
+			"repo":       item.Repo,
+			"owner":      item.Owner,
+			"version":    target.LatestVersion.Version,
 		})
 
 		if len(item.Manifest) == 0 {
@@ -242,8 +242,8 @@ func (a *Manager) listReleases(item GenericReleaseConfig) ([]*github.RepositoryR
 	}
 }
 
-// 1. For some reason, we get empty date when reading tag object
-//    We fetch information for corresponding sha to get tag date
+//  1. For some reason, we get empty date when reading tag object
+//     We fetch information for corresponding sha to get tag date
 func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 	res := []GithubRef{}
 	release := item.HasType("release")
@@ -312,7 +312,7 @@ func (a *Manager) getContent(ref string, item ManifestReleaseConfig, path string
 	}
 
 	defer stream.Close()
-	content, err := ioutil.ReadAll(stream)
+	content, err := io.ReadAll(stream)
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "could read remote stream")
 	}
@@ -335,8 +335,8 @@ func (a *Manager) createVersions(refs []GithubRef, last GithubRef, item GenericR
 // RenderManifest -
 func (a *Manager) RenderManifest(manifest []byte, item ManifestReleaseData) ([]byte, error) {
 	entry := log.WithFields(log.Fields{
-		"name": item.Name,
-		"repo": item.Repo,
+		"name":  item.Name,
+		"repo":  item.Repo,
 		"owner": item.Owner,
 	})
 	entry.Debugf("rendering final manifest")

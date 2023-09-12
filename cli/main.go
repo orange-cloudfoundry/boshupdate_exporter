@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
-	log "github.com/sirupsen/logrus"
-	"github.com/prometheus/common/version"
 	"github.com/alecthomas/kingpin/v2"
+	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
+	"github.com/prometheus/common/version"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"os"
 )
 
 var (
 	configFile = kingpin.Flag("config", "Configuration file path").Required().File()
-	logLevel = kingpin.Flag(
+	logLevel   = kingpin.Flag(
 		"log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]",
 	).Default("info").String()
 	logStream = kingpin.Flag(
