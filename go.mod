@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/alecthomas/kingpin/v2 v2.3.2
+	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 	github.com/cloudfoundry/bosh-utils v0.0.414
 	github.com/cppforlife/go-patch v0.2.0
