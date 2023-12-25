@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.418
+	github.com/cloudfoundry/bosh-utils v0.0.419
 	github.com/cppforlife/go-patch v0.2.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/pkg/errors v0.9.1
@@ -25,7 +25,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/charlievieth/fs v0.0.3 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
-	github.com/cloudfoundry/socks5-proxy v0.2.105 // indirect
+	github.com/cloudfoundry/socks5-proxy v0.2.106 // indirect
 	github.com/cppforlife/go-semi-semantic v0.0.0-20160921010311-576b6af77ae4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
 	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
