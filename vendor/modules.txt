@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/tlsconfig v0.0.0-20231017135636-f0e44068c22f
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240116140718-a2c58c2ff70c
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
 # github.com/Masterminds/semver v1.5.0
@@ -29,7 +29,7 @@ github.com/cloudfoundry/bosh-cli/director
 github.com/cloudfoundry/bosh-cli/director/template
 github.com/cloudfoundry/bosh-cli/io
 github.com/cloudfoundry/bosh-cli/uaa
-# github.com/cloudfoundry/bosh-utils v0.0.425
+# github.com/cloudfoundry/bosh-utils v0.0.426
 ## explicit; go 1.21
 github.com/cloudfoundry/bosh-utils/crypto
 github.com/cloudfoundry/bosh-utils/errors
