@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/tlsconfig v0.0.0-20240212155513-9c53d48c26df
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240213144909-765c8d6ec2ff
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
 # github.com/Masterminds/semver v1.5.0
@@ -29,8 +29,8 @@ github.com/cloudfoundry/bosh-cli/director
 github.com/cloudfoundry/bosh-cli/director/template
 github.com/cloudfoundry/bosh-cli/io
 github.com/cloudfoundry/bosh-cli/uaa
-# github.com/cloudfoundry/bosh-utils v0.0.442
-## explicit; go 1.21
+# github.com/cloudfoundry/bosh-utils v0.0.444
+## explicit; go 1.21.0
 github.com/cloudfoundry/bosh-utils/crypto
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -42,7 +42,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.111
+# github.com/cloudfoundry/socks5-proxy v0.2.112
 ## explicit; go 1.21
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
