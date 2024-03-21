@@ -13,7 +13,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
-	github.com/prometheus/common v0.50.0
+	github.com/prometheus/common v0.51.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/oauth2 v0.18.0
 	gopkg.in/yaml.v2 v2.4.0
