@@ -128,7 +128,7 @@ func NewDirector(config BoshConfig) (director.Director, error) {
 		uaaURL := infos.Auth.Options["url"]
 		uaaURLStr, ok := uaaURL.(string)
 		if !ok {
-			return nil, fmt.Errorf("Expected UAA URL '%s' to be a string", uaaURL)
+			return nil, fmt.Errorf("expected UAA URL '%s' to be a string", uaaURL)
 		}
 		uaaCli, err := buildUAA(uaaURLStr, config, log)
 		if err != nil {
