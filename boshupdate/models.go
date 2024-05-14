@@ -16,7 +16,7 @@ func (s *Formatter) Format(ref string) string {
 	return re.ReplaceAllString(ref, s.Replace)
 }
 
-// Match -
+// DoesMatch -
 func (s *Formatter) DoesMatch(ref string) bool {
 	re := regexp.MustCompile(s.Match)
 	return re.MatchString(ref)

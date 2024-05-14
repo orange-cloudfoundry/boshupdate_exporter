@@ -2,7 +2,7 @@
 
 A [Prometheus][prometheus] exporter that identifies out of date [BOSH][bosh] deployments.
 
-It queries [Github][github] and fetches available releases of canonical [BOSH][bosh] manifests
+It queries [GitHub][github] and fetches available releases of canonical [BOSH][bosh] manifests
 such as [cf-deployment][cf-deployment], then conciliates with actual running deployments
 fetched from [BOSH][bosh]  director.
 
@@ -29,16 +29,16 @@ $ docker run -p 9362:9362 orangeopensource/boshupdate-exporter <flags>
 
 ### BOSH
 
-This exporter can be deployed using the [Githubexporter BOSH Release][githubexporter-boshrelease].
+This exporter can be deployed using the BOSH Release: https://github.com/orange-cloudfoundry/boshupdate-boshrelease.
 
 ## Usage
 
-### Github Token
+### GitHub Token
 
-In order to connect to the [Github API][github_api] a `token` must be provided.
-The `token` can be created by following the [Github HowTo][github-create-token]
+In order to connect to the [GitHub API][github_api] a `token` must be provided.
+The `token` can be created by following the [GitHub HowTo][github-create-token]
 
-### Bosh deployment prerequites
+### Bosh deployment prerequisites
 
 The exporter identifies the version of a running deployment by extracting the `manifest_version`.
 
@@ -71,10 +71,10 @@ bosh:
   excludes: list[regexp]  # list of bosh deployment to exclude from scrap
 
 github:
-  token: <string>                          # your github token here
-  update_interval: 4h                      # interval between two github updates
+  token: <string>                          # your GitHub token here
+  update_interval: 4h                      # interval between two GitHub updates
   manifest_releases: map[string, manifest] # list of canonical manifests to monitor
-  generic_releases:  map[string, generic]  # list of generic github release to monitor
+  generic_releases:  map[string, generic]  # list of generic GitHub release to monitor
 ```
 
 
@@ -84,8 +84,8 @@ github:
 <name>:
     types: *release-types*
     format: *release-formatter*
-    owner: <string>        # github project's owner or organization
-    repo: <string>         # github project's name
+    owner: <string>        # GitHub project's owner or organization
+    repo: <string>         # GitHub project's name
     manifest: <string>     # remote path to main BOSH manifest
     ops: list[string]      # list of remote ops-file paths to apply to main manifest
     vars: list[string]     # list of remote vars-file paths to apply to main manifest
@@ -98,8 +98,8 @@ github:
 <name>:
     types: *release-types*
     format: *release-formatter*
-    owner: <string>     # github project's owner or organization
-    repo: <string>      # github project's name
+    owner: <string>     # GitHub project's owner or organization
+    repo: <string>      # GitHub project's name
 ```
 
 * *release-types*
@@ -109,10 +109,10 @@ github:
 list[string]
 
 # String must be one or more of the following values:
-# - release:       Github release which is neither in 'draft' nor 'pre' state
-# - pre_release:   Github release in 'pre' state
-# - draft_release: Github release in 'draft' state
-# - tag:           Github tag
+# - release:       GitHub release which is neither in 'draft' nor 'pre' state
+# - pre_release:   GitHub release in 'pre' state
+# - draft_release: GitHub release in 'draft' state
+# - tag:           GitHub tag
 ```
 
 * *format*
@@ -131,17 +131,17 @@ format:
 
 ### Flags
 
-| Flag / Environment Variable                                          | Required | Default         | Description                                                                                                                                                                                                                           |
-| ---------------------------                                          | -------- | -------         | -----------                                                                                                                                                                                                                           |
-| `config`<br />`BOSHUPDATE_EXPORTER_CONFIG`                           | No       | `config.yml`    | Path to configuration file                                                                                                                                                                                                            |
-| `metrics.namespace`<br />`BOSHUPDATE_EXPORTER_METRICS_NAMESPACE`     | No       | `boshupdate`    | Metrics Namespace                                                                                                                                                                                                                     |
-| `metrics.environment`<br />`BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT` | Yes      |                 | `environment` label to be attached to metrics                                                                                                                                                                                         |
-| `web.listen-address`<br />`BOSHUPDATE_EXPORTER_WEB_LISTEN_ADDRESS`   | No       | `:9362`         | Address to listen on for web interface and telemetry                                                                                                                                                                                  |
-| `web.telemetry-path`<br />`BOSHUPDATE_EXPORTER_WEB_TELEMETRY_PATH`   | No       | `/metrics`      | Path under which to expose Prometheus metrics                                                                                                                                                                                         |
-| `web.auth.username`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_USERNAME`     | No       |                 | Username for web interface basic auth                                                                                                                                                                                                 |
-| `web.auth.password`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_PASSWORD`     | No       |                 | Password for web interface basic auth                                                                                                                                                                                                 |
-| `web.tls.cert_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_CERTFILE`      | No       |                 | Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate |
-| `web.tls.key_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE`        | No       |                 | Path to a file that contains the TLS private key (PEM format)                                                                                                                                                                         |
+| Flag / Environment Variable                                          | Required | Default      | Description                                                                                                                                                                                                                           |
+|----------------------------------------------------------------------|----------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `config`<br />`BOSHUPDATE_EXPORTER_CONFIG`                           | No       | `config.yml` | Path to configuration file                                                                                                                                                                                                            |
+| `metrics.namespace`<br />`BOSHUPDATE_EXPORTER_METRICS_NAMESPACE`     | No       | `boshupdate` | Metrics Namespace                                                                                                                                                                                                                     |
+| `metrics.environment`<br />`BOSHUPDATE_EXPORTER_METRICS_ENVIRONMENT` | Yes      |              | `environment` label to be attached to metrics                                                                                                                                                                                         |
+| `web.listen-address`<br />`BOSHUPDATE_EXPORTER_WEB_LISTEN_ADDRESS`   | No       | `:9362`      | Address to listen on for web interface and telemetry                                                                                                                                                                                  |
+| `web.telemetry-path`<br />`BOSHUPDATE_EXPORTER_WEB_TELEMETRY_PATH`   | No       | `/metrics`   | Path under which to expose Prometheus metrics                                                                                                                                                                                         |
+| `web.auth.username`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_USERNAME`     | No       |              | Username for web interface basic auth                                                                                                                                                                                                 |
+| `web.auth.password`<br />`BOSHUPDATE_EXPORTER_WEB_AUTH_PASSWORD`     | No       |              | Password for web interface basic auth                                                                                                                                                                                                 |
+| `web.tls.cert_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_CERTFILE`      | No       |              | Path to a file that contains the TLS certificate (PEM format). If the certificate is signed by a certificate authority, the file should be the concatenation of the server's certificate, any intermediates, and the CA's certificate |
+| `web.tls.key_file`<br />`BOSHUPDATE_EXPORTER_WEB_TLS_KEYFILE`        | No       |              | Path to a file that contains the TLS private key (PEM format)                                                                                                                                                                         |
 
 
 ### Metrics
@@ -152,7 +152,7 @@ The exporter returns the following  metrics:
 | Metric                                             | Description                                                                                   | Labels                                                                                                                                 |
 |----------------------------------------------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
 | *metrics.namespace*_manifest_release               | Seconds from epoch since canonical manifest version if out-of-date, 0 means up-to-date        | `environment`, `name`, `version`, `owner`, `repo`                                                                                      |
-| *metrics.namespace*_manifest_bosh_release_info     | Information about recommended bosh releases used by last available canonical manifest release | `environment`, `manifest_name`, `onwer`, `repo`, `boshrelease_name`, `boshrelease_version`, `boshrelease_url`                          |
+| *metrics.namespace*_manifest_bosh_release_info     | Information about recommended bosh releases used by last available canonical manifest release | `environment`, `manifest_name`, `owner`, `repo`, `boshrelease_name`, `boshrelease_version`, `boshrelease_url`                          |
 | *metrics.namespace*_generic_release                | Seconds from epoch since repository version is out-of-date, 0 means up-to-date                | `environment`, `name`, `version`, `owner`, `repo`                                                                                      |
 | *metrics.namespace*_deployment_status              | Seconds from epoch since deployment is out-of-date, 0 means up-to-date                        | `environment`, `name`, `current`, `latest`                                                                                             |
 | *metrics.namespace*_deployment_bosh_release_status | Seconds from epoch since bosh release is out-of-date, 0 means up-to-date                      | `environment`, `manifest_name`, `manifest_current`, `manifest_latest`, `boshrelease_name`, `boshrelease_current`, `boshrelease_latest` |
