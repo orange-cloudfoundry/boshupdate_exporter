@@ -120,6 +120,9 @@ func NewDirector(config BoshConfig) (director.Director, error) {
 	}
 
 	directorConfig, err := director.NewConfigFromURL(config.URL)
+	if err != nil {
+		return nil, err
+	}
 	directorConfig.CACert = config.CaCert
 	if infos.Auth.Type != "uaa" {
 		directorConfig.Client = config.Username

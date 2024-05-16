@@ -121,13 +121,16 @@ func main() {
 	startUpdate(manager, interval)
 	http.Handle(*metricsPath, prometheusHandler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
+		_, err := w.Write([]byte(`<html>
              <head><title>Boshupdate Exporter</title></head>
              <body>
              <h1>Boshupdate Exporter</h1>
              <p><a href='` + *metricsPath + `'>Metrics</a></p>
              </body>
              </html>`))
+		if err != nil {
+			log.Errorf("write error: %s", err)
+		}
 	})
 
 	if *tlsCertFile != "" && *tlsKeyFile != "" {
