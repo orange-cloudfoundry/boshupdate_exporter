@@ -232,9 +232,7 @@ func (a *Manager) listReleases(item GenericReleaseConfig) ([]*github.RepositoryR
 		if err != nil {
 			return res, err
 		}
-		for _, d := range data {
-			res = append(res, d)
-		}
+		res = append(res, data...)
 		if resp.NextPage == 0 {
 			return res, nil
 		}
