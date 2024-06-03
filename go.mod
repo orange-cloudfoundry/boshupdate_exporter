@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.468
+	github.com/cloudfoundry/bosh-utils v0.0.469
 	github.com/cppforlife/go-patch v0.2.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/pkg/errors v0.9.1
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240522170710-79df114af82a // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240530171334-2593348de0c6 // indirect
 	github.com/alecthomas/units v0.0.0-20231202071711-9a357b53e9c9 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
