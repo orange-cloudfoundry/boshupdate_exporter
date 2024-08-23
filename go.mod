@@ -1,6 +1,6 @@
 module github.com/orange-cloudfoundry/boshupdate_exporter
 
-go 1.22.3
+go 1.22.6
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -19,7 +19,7 @@ require (
 
 require (
 	code.cloudfoundry.org/tlsconfig v0.1.0 // indirect
-	github.com/alecthomas/units v0.0.0-20231202071711-9a357b53e9c9 // indirect
+	github.com/alecthomas/units v0.0.0-20240626203959-61d1e3462e30 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
