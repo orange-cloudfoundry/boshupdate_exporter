@@ -2,11 +2,12 @@ package boshupdate
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+
 	"github.com/cloudfoundry/bosh-cli/director"
 	"github.com/cloudfoundry/bosh-cli/uaa"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"os"
-	"regexp"
 )
 
 // BoshConfig -
