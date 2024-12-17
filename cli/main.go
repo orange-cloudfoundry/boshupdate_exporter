@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/common/version"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
-	"os"
 )
 
 var (

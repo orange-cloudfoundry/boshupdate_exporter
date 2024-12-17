@@ -1,11 +1,12 @@
 package main
 
 import (
+	"time"
+
 	"github.com/orange-cloudfoundry/boshupdate_exporter/boshupdate"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
@@ -111,7 +112,6 @@ func initMetricsReporter(namespace string, environment string) {
 func getVersion(
 	deployment boshupdate.BoshDeploymentData,
 	releases []boshupdate.ManifestReleaseData) (*boshupdate.ManifestReleaseData, *boshupdate.Version) {
-
 	for _, r := range releases {
 		if !r.Match(deployment.ManifestName) {
 			continue

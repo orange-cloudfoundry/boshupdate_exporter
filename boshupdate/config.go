@@ -3,13 +3,14 @@ package boshupdate
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 // GenericReleaseConfig -

@@ -3,6 +3,10 @@ package boshupdate
 import (
 	"context"
 	"fmt"
+	"io"
+	"regexp"
+	"sort"
+
 	"github.com/Masterminds/semver"
 	"github.com/cloudfoundry/bosh-cli/director"
 	boshtpl "github.com/cloudfoundry/bosh-cli/director/template"
@@ -12,9 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"gopkg.in/yaml.v2"
-	"io"
-	"regexp"
-	"sort"
 )
 
 // Manager -
@@ -280,7 +281,7 @@ func (a *Manager) getRefs(item GenericReleaseConfig) ([]GithubRef, error) {
 		}
 	}
 
-	sort.Slice(res[:], func(i, j int) bool {
+	sort.Slice(res, func(i, j int) bool {
 		vi := item.Format.Format(res[i].Ref)
 		vj := item.Format.Format(res[j].Ref)
 		semvi, erri := semver.NewVersion(vi)
