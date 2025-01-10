@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/tlsconfig v0.7.0
+# code.cloudfoundry.org/tlsconfig v0.15.0
 ## explicit; go 1.22
 code.cloudfoundry.org/tlsconfig
 # github.com/Masterminds/semver v1.5.0
@@ -29,7 +29,7 @@ github.com/cloudfoundry/bosh-cli/director
 github.com/cloudfoundry/bosh-cli/director/template
 github.com/cloudfoundry/bosh-cli/io
 github.com/cloudfoundry/bosh-cli/uaa
-# github.com/cloudfoundry/bosh-utils v0.0.500
+# github.com/cloudfoundry/bosh-utils v0.0.520
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-utils/crypto
 github.com/cloudfoundry/bosh-utils/errors
@@ -42,7 +42,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.127
+# github.com/cloudfoundry/socks5-proxy v0.2.137
 ## explicit; go 1.22.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -112,7 +112,7 @@ github.com/sirupsen/logrus
 # github.com/xhit/go-str2duration/v2 v2.1.0
 ## explicit; go 1.13
 github.com/xhit/go-str2duration/v2
-# golang.org/x/crypto v0.28.0
+# golang.org/x/crypto v0.32.0
 ## explicit; go 1.20
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -121,7 +121,7 @@ golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.30.0
+# golang.org/x/net v0.34.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/internal/socks
@@ -130,13 +130,13 @@ golang.org/x/net/proxy
 ## explicit; go 1.18
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.26.0
+# golang.org/x/sys v0.29.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# google.golang.org/protobuf v1.34.2
-## explicit; go 1.20
+# google.golang.org/protobuf v1.36.1
+## explicit; go 1.21
 google.golang.org/protobuf/encoding/protodelim
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
@@ -156,6 +156,7 @@ google.golang.org/protobuf/internal/genid
 google.golang.org/protobuf/internal/impl
 google.golang.org/protobuf/internal/order
 google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/protolazy
 google.golang.org/protobuf/internal/set
 google.golang.org/protobuf/internal/strs
 google.golang.org/protobuf/internal/version
