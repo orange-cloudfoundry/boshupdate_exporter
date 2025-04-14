@@ -3,13 +3,14 @@ package boshupdate
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 // GenericReleaseConfig -
@@ -21,10 +22,10 @@ type GenericReleaseConfig struct {
 }
 
 func (c *GenericReleaseConfig) validate(name string) error {
-	if 0 == len(c.Owner) {
+	if len(c.Owner) == 0 {
 		return fmt.Errorf("missing mandatory owner")
 	}
-	if 0 == len(c.Repo) {
+	if len(c.Repo) == 0 {
 		return fmt.Errorf("missing mandatory repo")
 	}
 	if len(c.Types) == 0 {
@@ -124,7 +125,7 @@ func (c *GithubConfig) validate() error {
 			return fmt.Errorf("invalid generic release '%s', %s", name, err)
 		}
 	}
-	if 0 == len(c.Token) {
+	if len(c.Token) == 0 {
 		return fmt.Errorf("missing mandatory github token")
 	}
 	_, err := time.ParseDuration(c.UpdateInterval)

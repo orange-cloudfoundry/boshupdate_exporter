@@ -2,11 +2,12 @@ package boshupdate
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+
 	"github.com/cloudfoundry/bosh-cli/director"
 	"github.com/cloudfoundry/bosh-cli/uaa"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"os"
-	"regexp"
 )
 
 // BoshConfig -
@@ -106,7 +107,10 @@ func getDirectorInfo(config BoshConfig, logger logger.Logger) (*director.Info, e
 // NewDirector -
 func NewDirector(config BoshConfig) (director.Director, error) {
 	if config.Proxy != "" {
-		os.Setenv("BOSH_ALL_PROXY", config.Proxy)
+		err := os.Setenv("BOSH_ALL_PROXY", config.Proxy)
+		if err != nil {
+			return nil, fmt.Errorf("failed to set BOSH_ALL_PROXY: %s", err)
+		}
 	}
 
 	log, err := buildLogger(config)
