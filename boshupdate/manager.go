@@ -3,18 +3,20 @@ package boshupdate
 import (
 	"context"
 	"fmt"
+	"io"
+	"regexp"
+	"sort"
+
 	"github.com/Masterminds/semver"
 	"github.com/cloudfoundry/bosh-cli/director"
 	boshtpl "github.com/cloudfoundry/bosh-cli/director/template"
 	"github.com/cppforlife/go-patch/patch"
 	"github.com/google/go-github/github"
+	"github.com/orange-cloudfoundry/boshupdate_exporter/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"gopkg.in/yaml.v2"
-	"io"
-	"regexp"
-	"sort"
 )
 
 // Manager -
@@ -309,7 +311,7 @@ func (a *Manager) getContent(ref string, item ManifestReleaseConfig, path string
 		return []byte{}, errors.Wrapf(err, "could not download file '%s'", path)
 	}
 
-	defer stream.Close()
+	defer utils.CloseAndLogError(stream)
 	content, err := io.ReadAll(stream)
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "could read remote stream")
