@@ -1,6 +1,6 @@
 module github.com/orange-cloudfoundry/boshupdate_exporter
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -35,10 +35,10 @@ require (
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 )
