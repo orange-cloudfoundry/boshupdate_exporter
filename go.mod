@@ -1,6 +1,6 @@
 module github.com/orange-cloudfoundry/boshupdate_exporter
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.71.0
 	github.com/sirupsen/logrus v1.10.2
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
