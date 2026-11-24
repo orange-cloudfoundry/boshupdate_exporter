@@ -1,12 +1,12 @@
 module github.com/orange-cloudfoundry/boshupdate_exporter
 
-go 1.26.11
+go 1.27.4
 
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.676
+	github.com/cloudfoundry/bosh-utils v0.0.678
 	github.com/cppforlife/go-patch v0.2.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/pkg/errors v0.9.1
@@ -18,13 +18,13 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.69.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.74.0 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 // indirect
-	github.com/cloudfoundry/socks5-proxy v0.2.197 // indirect
+	github.com/cloudfoundry/socks5-proxy v0.2.198 // indirect
 	github.com/cppforlife/go-semi-semantic v0.0.0-20160921010311-576b6af77ae4 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/jpillora/backoff v1.1.0 // indirect
@@ -35,10 +35,10 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pandatix/go-abnf v0.5.5 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
-	github.com/prometheus/procfs v0.22.0 // indirect
-	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
+	github.com/prometheus/procfs v0.23.0 // indirect
+	github.com/xhit/go-str2duration/v2 v2.2.0 // indirect
 	golang.org/x/crypto v0.59.0 // indirect
-	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/net v0.63.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
